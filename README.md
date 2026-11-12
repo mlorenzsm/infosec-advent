@@ -13,8 +13,8 @@ Server, keine Datenbank, kein Build-Schritt.
 python3 -m http.server 8099
 ```
 
-Dann <http://localhost:8099> öffnen. Für den Kiosk die Seite im Browser im
-Vollbild zeigen (Chrome: `F11`, macOS: `Ctrl+Cmd+F`).
+Dann <http://localhost:8099> öffnen. Auf dem Kundenstopper (Linux Mint) gibt
+es dafür `tools/kiosk.sh` — siehe [Kiosk](#kiosk-linux-mint).
 
 ## Auf dem Display
 
@@ -75,10 +75,13 @@ Zahl ändern; die Türchen selbst sind jahresunabhängig formuliert.
 ```
 index.html            Grundgerüst, alle Inhalte kommen aus dem JSON
 content/advent.json   24 Türchen
-static/style.css      Layout und Farben (Tokens, Dark Mode, Kiosk-Skalierung)
+static/style.css      Layout und Farben (Tokens, Kiosk-Skalierung)
 static/app.js         Datumslogik, Automatik, Quiz, Schnee
 static/fonts/         Geist, Geist Mono, Bricolage Grotesque (OFL)
+tools/kiosk.sh        Server + Chromium im Vollbild, Neustart bei Absturz
+tools/install-kiosk.sh  Autostart einrichten/entfernen
 tools/check_content.py
+deploy/               Autostart-Vorlage (.desktop)
 _selftest.html        Browsertests, s. u.
 ```
 
@@ -100,19 +103,89 @@ python3 -m http.server 8099 &          # Server muss laufen
 Dezember, Januar) und den Fortschrittsbalken. Die Datei ist nur zum Testen da
 und wird nicht ausgeliefert, wenn der Webserver nur `index.html` bedient.
 
-## Kiosk
+## Kiosk (Linux Mint)
 
-Der Kundenstopper (Android 11) zeigt die Seite in einem Browser im Vollbild.
-Zwei Wege:
+Der Kundenstopper läuft auf Linux Mint (Cinnamon). Die Seite ist statisch —
+es braucht keinen Webserver von außen, nur einen lokalen, weil Chromium
+`fetch()` auf `file://` blockiert.
 
-1. **Lokal**: Ordner auf das Gerät kopieren, eine kleine Datei-Server-App oder
-   einen Browser mit `file://`-Öffnung nutzen. Achtung: `file://` blockiert
-   `fetch()` in Chrome — dann braucht es einen Server.
-2. **Im Netz**: Ordner auf einen beliebigen Webserver legen (Caddy, nginx,
-   GitHub Pages). Es gibt keine Server-Logik, nur drei Dateien plus Fonts.
+### Einmal einrichten
 
-Für Dauerbetrieb: Bildschirmsperre und Standby im Android-Menü abschalten,
-Browser im Vollbild/Kiosk-Modus starten.
+```sh
+sudo apt install chromium unclutter
+tools/install-kiosk.sh
+```
+
+Mint liefert Chromium als Snap aus. `tools/kiosk.sh` findet auch
+`google-chrome` oder `brave-browser`, falls Chromium fehlt oder Snap
+unerwünscht ist.
+
+`install-kiosk.sh` legt `~/.config/autostart/adventkalender.desktop` an und
+schaltet in Cinnamon Bildschirmschoner, Standby und automatische Sperre ab.
+Nach dem nächsten Login startet der Kalender im Vollbild; stürzt Chromium ab,
+startet `tools/kiosk.sh` es nach zwei Sekunden neu.
+
+Rückgängig: `tools/install-kiosk.sh --remove`.
+
+Das Display startet den Browser im eingeloggten Benutzerkonto. Wer nicht
+möchte, dass der Kiosk in der normalen Sitzung mitläuft, legt einen eigenen
+Benutzer `kalender` an, meldet sich dort einmal an und richtet den Autostart
+in dessen Konto ein (automatischer Login in den Systemeinstellungen).
+
+### Von Hand starten
+
+```sh
+tools/kiosk.sh
+```
+
+Das Skript startet den lokalen Server auf Port 8099 (nur auf 127.0.0.1
+gebunden), öffnet Chromium im Kiosk-Modus und lässt ihn in einer Schleife
+laufen. Anderer Port: `PORT=8123 tools/kiosk.sh`. Anderer Browser:
+`BROWSER=google-chrome tools/kiosk.sh`.
+
+### Alternative: nur ein Tab im normalen Browser
+
+Reicht für einen Test: Server starten, Seite öffnen, `F11` für Vollbild.
+
+```sh
+python3 -m http.server 8099
+```
+
+### Display
+
+Der Kundenstopper ist hochkant (610 × 1810 mm). Die Seite erkennt das an der
+Fenstergröße und zeigt dann 4 × 6 statt 8 × 3. Damit das greift, muss die
+Bildschirmausrichtung in den Mint-Systemeinstellungen unter *Anzeige* auf
+*Hochformat* stehen — sonst rendert der Browser quer und legt den Kalender
+seitlich an. Auflösung 1080 × 1920 reicht; die Schrift skaliert mit.
+
+Hat das Gerät einen Touchscreen, funktioniert er ohne weitere Einrichtung.
+Ohne Touch läuft die Automatik allein weiter.
+
+### Dauerbetrieb
+
+- **Bildschirm bleibt an**: macht `install-kiosk.sh` per `gsettings`. Wenn der
+  Rechner trotzdem schwarz wird, im Cinnamon-Menü unter *Energieoptionen* →
+  *Bildschirm ausschalten nach* auf *Nie* stellen.
+- **Automatische Updates**: Der Kalender braucht kein Netz. Mint-Updates
+  dürfen laufen; nach einem Reboot kommt er per Autostart von selbst wieder.
+  Wichtig: Der Autostart greift erst nach dem Login. Ist der Rechner auf
+  automatischen Login gestellt, ist das Display in unter einer Minute wieder
+  da — sonst bleibt der Bildschirm nach einem Update-Reboot im Anmeldebildschirm
+  hängen.
+- **Uhrzeit**: Die Türchen richten sich nach der Systemzeit. Prüfen mit
+  `timedatectl`; bei falscher Zeitzone öffnen die Türchen zur falschen Stunde.
+- **Inhalt ändern**: `content/advent.json` bearbeiten, dann
+  `python3 tools/check_content.py` und im Kiosk `Ctrl+R` — ein Neustart des
+  Rechners ist nicht nötig.
+- **Debug ohne Kiosk-Modus**: `?datum=…`, `?auto=aus`, `?tur=…` funktionieren
+  in der Adresszeile (siehe oben).
+
+### Warum ein lokaler Server
+
+`fetch("content/advent.json")` schlägt unter `file://` an der
+Same-Origin-Regel fehl — die Seite bliebe leer. Der Server ist ein
+`python3 -m http.server`, also in Mint ohne Zusatzpaket vorhanden.
 
 ## Lizenzen
 

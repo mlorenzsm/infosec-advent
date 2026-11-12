@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Sicherheitskalender
+Comment=Adventskalender im Vollbild auf dem Kundenstopper
+# Exec-Pfad wird beim Installieren ersetzt (tools/install-kiosk.sh)
+Exec=__REPO__/tools/kiosk.sh
+Path=__REPO__
+Terminal=false
+X-GNOME-Autostart-enabled=true
+# Cinnamon: kein Fensterrahmen, kein eigenes Icon im Panel
+X-Cinnamon-Autostart-Phase=Application
+StartupNotify=false
