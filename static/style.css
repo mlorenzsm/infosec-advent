@@ -1,0 +1,536 @@
+/* Sicherheitskalender — Display-Fassung für den Kundenstopper.
+ *
+ * Ein Bildschirm, eine Schriftgröße pro Rolle: alles in rem, skaliert über
+ * clamp() mit der kürzeren Bildschirmkante (svmin). So bleibt das Layout auf
+ * 43"-Kiosk, Laptop und Handy gleich aufgebaut.
+ *
+ * Farben sind Rollen: Komponenten nehmen nur Tokens, Dark Mode tauscht nur
+ * die Tokens. Der Kalender ist absichtlich dunkel — er hängt drinnen und
+ * wird aus der Nähe gelesen, nicht im Sonnenlicht.
+ */
+@layer reset, tokens, base, board, detail, utilities;
+
+@font-face { font-family: "Geist"; src: url("fonts/geist.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Bricolage Grotesque"; src: url("fonts/bricolage.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/geist-mono.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { margin: 0; }
+  [hidden] { display: none !important; }
+}
+
+@layer tokens {
+  :root {
+    color-scheme: dark;
+
+    /* Tannengrün als Grund, warmes Gold als einzige „handeln“-Farbe. */
+    --ground: #0B1411;
+    --ground-2: #0F1B17;
+    --surface: #152420;
+    --surface-2: #1C2F29;
+    --line: #29423A;
+    --ink: #EAF1EA;
+    --muted: #A9B8AE;
+    --faint: #75867C;
+
+    --accent: #E8B84B;          /* Gold: geöffnete Tür, Fortschritt */
+    --accent-ink: #241A05;
+    --accent-soft: #3A2E12;
+
+    --snow: #DDE8E2;
+    --door: #1F3A31;            /* geschlossene Tür */
+    --door-ink: #B9CDC2;
+
+    --ok: #7FCFA8;
+    --ok-soft: #14312A;
+    --bad: #F08A7E;
+    --bad-soft: #3A1D19;
+
+    /* type: Geist für UI, Bricolage für Display, Mono für Zahlen */
+    --font-ui: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-display: "Bricolage Grotesque", "Avenir Next", var(--font-ui);
+    --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    /* Eine Skala, relativ zur kürzeren Kante. 1 svmin = 1 % der kürzeren
+     * Bildschirmkante: auf 1080p sind das 10,8 px, auf einem Handy 3,9 px.
+     * Der Faktor 1,75 macht aus dem Kiosk (1080p) eine 19-px-Einheit und
+     * daraus 30 px Fließtext; die Obergrenze greift erst bei 4K. */
+    --u: clamp(0.7rem, 1.55svmin, 1.9rem);
+    --text-xs: calc(var(--u) * 0.95);
+    --text-sm: calc(var(--u) * 1.25);
+    --text-md: calc(var(--u) * 1.6);
+    --text-lg: calc(var(--u) * 2.1);
+    --text-xl: calc(var(--u) * 2.9);
+    --text-2xl: calc(var(--u) * 4.2);
+    --text-hero: calc(var(--u) * 7.4);
+
+    --s-1: calc(var(--u) * 0.5);
+    --s-2: calc(var(--u) * 1);
+    --s-3: calc(var(--u) * 1.5);
+    --s-4: calc(var(--u) * 2);
+    --s-5: calc(var(--u) * 3);
+    --s-6: calc(var(--u) * 4.5);
+
+    --r-sm: calc(var(--u) * 0.9);
+    --r-md: calc(var(--u) * 1.5);
+    --r-lg: calc(var(--u) * 2.2);
+
+    --tap: max(44px, calc(var(--u) * 4));
+
+    --shadow-door: 0 2px 0 rgb(0 0 0 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.06);
+    --shadow-lift: 0 12px 40px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.35);
+  }
+}
+
+@layer base {
+  html, body { min-height: 100%; }
+  body {
+    background:
+      radial-gradient(ellipse 90% 70% at 50% -10%, #17352b 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at 50% 115%, #1a2a1c 0%, transparent 60%),
+      var(--ground);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: var(--text-md);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    cursor: default;
+    user-select: none;
+  }
+
+  h1, h2, h3, p { margin: 0; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  :focus-visible { outline: calc(var(--u) * 0.35) solid var(--accent); outline-offset: calc(var(--u) * 0.35); }
+
+  .stage {
+    min-height: 100svh;
+    height: 100svh;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    /* Grid-Kinder haben min-width:auto — ohne das schiebt ein langer Text
+     * die ganze Seite breiter als den Bildschirm. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-4);
+    padding: var(--s-5) var(--s-5) var(--s-4);
+    max-width: 1700px;
+    margin: 0 auto;
+  }
+  /* Hochkant: das Raster soll die volle Höhe nutzen, nicht mittig schweben. */
+  @media (max-aspect-ratio: 4/5) {
+    .stage { max-width: 1100px; }
+  }
+}
+
+@layer board {
+  /* --- Kopf ------------------------------------------------------------- */
+  .masthead { display: grid; gap: var(--s-2); }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .mast-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-5);
+    flex-wrap: wrap;
+  }
+  .title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .subtitle { color: var(--muted); font-size: var(--text-md); max-width: 42ch; }
+
+  /* --- Raster ----------------------------------------------------------- */
+  /* 8 × 3 auf dem Display: 43" im Hochformat, aus 3 m lesbar. */
+  .board {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: clamp(var(--s-2), 1.1svmin, var(--s-3));
+    min-height: 0;
+  }
+  .board > li { display: grid; min-height: 0; min-width: 0; }
+
+  .door {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border-radius: var(--r-md);
+    background: linear-gradient(160deg, var(--surface-2), var(--door));
+    box-shadow: var(--shadow-door);
+    color: var(--door-ink);
+    overflow: hidden;
+    transition: transform 160ms ease, box-shadow 160ms ease, background 300ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .door::after {
+    /* Türgriff: eine schmale Klinke am rechten Rand */
+    content: "";
+    position: absolute;
+    right: 8%;
+    top: 50%;
+    width: calc(var(--u) * 0.4);
+    height: calc(var(--u) * 2.2);
+    margin-top: calc(var(--u) * -1.1);
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.28;
+  }
+  .door:not([aria-disabled="true"]):hover { transform: translateY(calc(var(--u) * -0.2)); box-shadow: var(--shadow-lift); }
+  .door:not([aria-disabled="true"]):active { transform: scale(0.97); }
+  .door[aria-disabled="true"]:hover { box-shadow: 0 0 0 1px var(--line), var(--shadow-door); }
+
+  .door-day {
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* geöffnet */
+  .door.is-open {
+    background: linear-gradient(160deg, #2a3524, #202a20);
+    color: var(--accent);
+    box-shadow: inset 0 0 0 calc(var(--u) * 0.08) color-mix(in oklab, var(--accent) 18%, transparent),
+                inset 0 calc(var(--u) * 0.5) calc(var(--u) * 1.2) rgb(232 184 75 / 0.07),
+                var(--shadow-door);
+  }
+  .door.is-open .door-day { color: var(--accent); }
+  .door.is-open::after { opacity: 0; }
+
+  /* heute: der einzige pulsierende Punkt auf dem Bildschirm */
+  .door.is-today {
+    background: linear-gradient(160deg, var(--accent), #c9972f);
+    color: var(--accent-ink);
+    box-shadow: 0 0 0 calc(var(--u) * 0.25) rgb(232 184 75 / 0.18), var(--shadow-lift);
+    animation: today-pulse 3.2s ease-in-out infinite;
+  }
+  .door.is-today .door-day { color: var(--accent-ink); }
+  .door.is-today::after { opacity: 0.35; }
+
+  /* Tür mit Inhalt, der noch verschlossen ist: dezente Schneekante */
+  .door.is-future {
+    background: linear-gradient(160deg, #1a2e27, #14231e);
+    color: #93a99d;
+  }
+  .door.is-future::after { opacity: 0.18; }
+
+  /* neu geöffnet: kurzer Schein */
+  .door.is-new { animation: door-open 900ms ease both; }
+
+  /* Sonderfall: Türchen außerhalb des Advents (1.–24. Dez.) */
+  .door.is-muted { opacity: 0.38; }
+
+  @keyframes today-pulse {
+    0%, 100% { box-shadow: 0 0 0 calc(var(--u) * 0.25) rgb(232 184 75 / 0.18), var(--shadow-lift); }
+    50%      { box-shadow: 0 0 0 calc(var(--u) * 0.65) rgb(232 184 75 / 0.10), var(--shadow-lift); }
+  }
+  @keyframes door-open {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.06); box-shadow: 0 0 0 calc(var(--u) * 1.2) rgb(232 184 75 / 0.35); }
+    100% { transform: scale(1); }
+  }
+
+  .board-error {
+    grid-column: 1 / -1;
+    color: var(--bad);
+    text-align: center;
+    font-size: var(--text-lg);
+  }
+
+  /* --- Fußzeile --------------------------------------------------------- */
+  .foot {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--s-5);
+    border-top: 1px solid var(--line);
+    padding-top: var(--s-3);
+  }
+  .foot-cell { display: grid; gap: calc(var(--u) * 0.35); min-width: 0; }
+  .foot-hint { overflow-wrap: anywhere; }
+  .foot-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .foot-value { font-size: var(--text-md); color: var(--snow); }
+  .foot-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .foot-progress { gap: var(--s-2); }
+  .foot-clock { justify-items: end; text-align: right; }
+
+  .bar {
+    height: calc(var(--u) * 0.75);
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.35);
+  }
+  .bar-fill {
+    display: block;
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #b8862f, var(--accent));
+    transition: width 800ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .foot-hint { color: var(--muted); font-size: var(--text-sm); }
+}
+
+@layer detail {
+  /* Vollbild-Overlay statt Modal-Box: aus 3 m Entfernung ist ein Dialog
+   * in der Mitte des 43" nicht mehr lesbar. */
+  .detail {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    padding: var(--s-5);
+    background: rgb(5 10 8 / 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: fade-in 200ms ease both;
+  }
+  .detail-card {
+    width: min(100%, 1400px);
+    /* 8 × 3 auf 16:9: 1500 px ist breiter als der sichtbare Bereich in einem
+     * 1200-px-Screenshot, aber auf dem 43" (3840 × 2160) genau richtig. */
+    max-height: calc(100svh - var(--s-6));
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: center;
+    gap: var(--s-6);
+    padding: var(--s-5);
+    border-radius: var(--r-lg);
+    background: linear-gradient(165deg, var(--ground-2), #101c17);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-lift);
+    animation: rise-in 280ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .detail-left { display: grid; align-content: start; gap: var(--s-3); }
+  .detail-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .detail-num {
+    display: grid;
+    place-items: center;
+    min-width: calc(var(--u) * 3.2);
+    height: calc(var(--u) * 3.2);
+    padding: 0 calc(var(--u) * 0.6);
+    border-radius: var(--r-sm);
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    letter-spacing: 0;
+  }
+  .detail-motto { font-family: var(--font-mono); color: var(--muted); font-size: var(--text-sm); letter-spacing: 0.1em; text-transform: uppercase; }
+  .detail-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .detail-lead { font-size: var(--text-md); color: var(--snow); max-width: 34ch; }
+
+  .detail-right { display: grid; align-content: start; gap: var(--s-4); }
+  .detail-body { font-size: var(--text-md); color: var(--muted); max-width: 52ch; }
+
+  .detail-action {
+    display: flex;
+    gap: var(--s-3);
+    padding: var(--s-3) var(--s-4);
+    border-radius: var(--r-md);
+    background: var(--accent-soft);
+    border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent);
+    font-size: var(--text-md);
+    color: var(--snow);
+  }
+  .detail-action strong { color: var(--accent); font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: calc(var(--u) * 0.3); }
+
+  /* Quiz */
+  .quiz { display: grid; gap: var(--s-3); }
+  .quiz-q { font-size: var(--text-md); color: var(--snow); }
+  .quiz-options { display: grid; gap: var(--s-2); }
+  .quiz-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-3);
+    width: 100%;
+    padding: var(--s-3) var(--s-4);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    text-align: left;
+    font-size: var(--text-md);
+    min-height: var(--tap);
+    transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+  }
+  .quiz-option:hover:not(:disabled) { border-color: var(--accent); transform: translateX(calc(var(--u) * 0.3)); }
+  .quiz-option:disabled { cursor: default; }
+  .quiz-mark {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: calc(var(--u) * 2);
+    height: calc(var(--u) * 2);
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+  .quiz-option.is-right { background: var(--ok-soft); border-color: var(--ok); }
+  .quiz-option.is-right .quiz-mark { background: var(--ok); color: #062015; }
+  .quiz-option.is-wrong { background: var(--bad-soft); border-color: var(--bad); }
+  .quiz-option.is-wrong .quiz-mark { background: var(--bad); color: #2a0d0a; }
+
+  .quiz-result { display: grid; gap: var(--s-2); }
+  .quiz-verdict { font-size: var(--text-lg); font-family: var(--font-display); font-weight: 700; }
+  .quiz-verdict.is-right { color: var(--ok); }
+  .quiz-verdict.is-wrong { color: var(--bad); }
+  .quiz-explain { color: var(--muted); font-size: var(--text-md); }
+
+  /* Challenge */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); counter-reset: step; }
+  .steps li {
+    display: flex;
+    gap: var(--s-3);
+    font-size: var(--text-md);
+    color: var(--snow);
+  }
+  .steps li::before {
+    counter-increment: step;
+    content: counter(step);
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: calc(var(--u) * 2.4);
+    height: calc(var(--u) * 2.4);
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .detail-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); margin-top: var(--s-2); }
+  .detail-close {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: var(--tap);
+    padding: 0 var(--s-4);
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+    font-size: var(--text-md);
+  }
+  .detail-close:hover { background: color-mix(in oklab, var(--accent) 88%, white); }
+  .detail-nav { display: flex; gap: var(--s-2); }
+  .detail-nav button {
+    min-height: var(--tap);
+    min-width: var(--tap);
+    padding: 0 var(--s-3);
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: var(--text-sm);
+  }
+  .detail-nav button:disabled { opacity: 0.35; cursor: default; }
+  .detail-nav button:not(:disabled):hover { border-color: var(--accent); color: var(--accent); }
+
+  .detail-teaser { color: var(--muted); font-size: var(--text-md); }
+  .detail-teaser strong { color: var(--accent); }
+
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rise-in { from { opacity: 0; transform: translateY(calc(var(--u) * 1.5)) scale(0.99); } to { opacity: 1; transform: none; } }
+}
+
+@layer utilities {
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: var(--s-5);
+    transform: translateX(-50%);
+    z-index: 20;
+    padding: var(--s-3) var(--s-5);
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-lift);
+    font-size: var(--text-md);
+    animation: fade-in 160ms ease both;
+  }
+
+  /* Kleine Fenster (Laptop, Handy): Detailkarte einspaltig. */
+  @media (max-width: 1000px) {
+    .detail-card { grid-template-columns: 1fr; }
+  }
+
+  /* Hochkant-Display (der Kundenstopper ist 610 × 1810 mm → eher 3:4) */
+  @media (max-aspect-ratio: 4/5) {
+    .board { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); }
+    .detail-card { grid-template-columns: 1fr; }
+    .detail-lead { max-width: none; }
+  }
+
+  /* Handy: vier Spalten, aber die Türen behalten ihre Höhe — das Raster
+   * darf scrollen, statt die Schrift unter die Lesbarkeit zu quetschen. */
+  @media (max-width: 700px) {
+    .stage {
+      padding: var(--s-4) var(--s-3) var(--s-3);
+      min-height: 0;
+      height: auto;
+      grid-template-rows: auto auto auto;
+    }
+    .detail { padding: var(--s-3); }
+    .detail-card { gap: var(--s-4); padding: var(--s-4); }
+    .mast-row { flex-direction: column; gap: var(--s-1); }
+    .foot { grid-template-columns: minmax(0, auto) minmax(0, 1fr); }
+    .foot-clock { display: none; }
+    .board {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: none;
+      gap: var(--s-2);
+    }
+    .board > li { aspect-ratio: 1 / 0.8; }
+    .door-day { font-size: var(--text-lg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+}

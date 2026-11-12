@@ -1,0 +1,311 @@
+{
+  "year": 2026,
+  "kicker": "24 Tage Informationssicherheit",
+  "title": "Sicherheitskalender",
+  "subtitle": "Ein Türchen pro Tag. Kein Fachchinesisch, nur Dinge, die wirklich helfen.",
+  "doors": [
+    {
+      "day": 1,
+      "kind": "tipp",
+      "motto": "Der Schlüsselbund",
+      "title": "Ein Schlüssel für alle Türen",
+      "lead": "Das gleiche Passwort überall ist wie ein Haustürschlüssel, der auch ins Büro, ins Auto und zum Bankschließfach passt.",
+      "body": "Ein Passwort-Manager merkt sich für jede Seite ein eigenes, langes Passwort. Du musst dir nur noch eines merken – und wenn eine Seite gehackt wird, sind die anderen nicht mit betroffen.",
+      "action": "Schau nach, ob dein Browser oder dein Handy schon einen Passwort-Manager eingebaut hat. Meist ist er längst da."
+    },
+    {
+      "day": 2,
+      "kind": "quiz",
+      "motto": "Detektivarbeit",
+      "title": "Riecht das nach Betrug?",
+      "lead": "Drei Mails im Postfach. Welche ist am verdächtigsten?",
+      "question": "Welche Mail würdest du zuerst misstrauisch anschauen?",
+      "options": [
+        "„Ihre Bestellung wurde versandt – hier die Sendungsverfolgung.“",
+        "„Ihr Konto wird in 24 Stunden gesperrt. Jetzt bestätigen.“",
+        "„Der Speiseplan der Kantine für den Dezember.“"
+      ],
+      "correct": 1,
+      "explanation": "Druck, eine knappe Frist und ein Link zum Bestätigen – das ist das klassische Muster von Phishing. Seriöse Absender sperren nichts per Mail in 24 Stunden.",
+      "action": "Wenn dich eine Mail unter Druck setzt: nicht klicken, sondern die Seite selbst aufrufen oder bei der IT nachfragen."
+    },
+    {
+      "day": 3,
+      "kind": "challenge",
+      "motto": "Zwei Schlösser",
+      "title": "Schalte 2FA ein",
+      "lead": "Selbst mit geklautem Passwort: Mit einem zweiten Faktor kommt niemand weit.",
+      "steps": [
+        "Öffne die Sicherheitseinstellungen deines wichtigsten Kontos – meistens das E-Mail-Konto.",
+        "Aktiviere die Zwei-Faktor-Authentisierung (2FA).",
+        "Speichere die Backup-Codes dort, wo du sie wiederfindest."
+      ],
+      "action": "Fünf Minuten heute, deutlich weniger Sorgen morgen."
+    },
+    {
+      "day": 4,
+      "kind": "tipp",
+      "motto": "Flickwerk",
+      "title": "Updates sind Flicken",
+      "lead": "Ein Update ist kein lästiger Neustart, sondern ein Flicken für ein Loch, das andere längst gefunden haben.",
+      "body": "Die gefährlichsten Angriffe nutzen Schwachstellen, für die es seit Monaten einen Patch gibt. Wer nicht aktualisiert, lässt die Tür offen, obwohl der Schlüssel schon in der Schublade liegt.",
+      "action": "Starte heute die Updates, die seit Wochen auf „Später“ warten. Danach darf der Rechner ruhig neu starten."
+    },
+    {
+      "day": 5,
+      "kind": "quiz",
+      "motto": "Passwortschule",
+      "title": "Länge schlägt Komplexität",
+      "lead": "Was macht ein Passwort wirklich stark?",
+      "question": "Womit knackt man ein Passwort am schwersten?",
+      "options": [
+        "Mit Sonderzeichen wie $ ! % und einer Zahl am Ende.",
+        "Mit mindestens 12 Zeichen – gern vier zufällige Wörter.",
+        "Mit dem Lieblingswort rückwärts geschrieben."
+      ],
+      "correct": 1,
+      "explanation": "Jedes zusätzliche Zeichen vervielfacht den Aufwand. „KaffeeTasseFahrradNebel“ ist stärker als „P@ssw0rt!“ – und viel leichter zu merken.",
+      "action": "Verlängere heute dein wichtigstes Passwort auf vier Wörter. Oder lass es vom Passwort-Manager erzeugen."
+    },
+    {
+      "day": 6,
+      "kind": "challenge",
+      "motto": "Trockenübung",
+      "title": "Teste dein Backup",
+      "lead": "Ein Backup, das nie getestet wurde, ist nur eine Hoffnung.",
+      "steps": [
+        "Wähle eine Datei, die dir wichtig ist – ein Foto, ein Dokument.",
+        "Öffne sie aus deiner Sicherung, nicht aus dem Originalordner.",
+        "Prüfe, ob sie sich öffnen lässt und vollständig ist."
+      ],
+      "action": "Wenn das nicht klappt: lieber heute merken als an dem Tag, an dem du es brauchst."
+    },
+    {
+      "day": 7,
+      "kind": "tipp",
+      "motto": "Café-WLAN",
+      "title": "Der Kaffee ist gratis. Der Mitleser auch.",
+      "lead": "In offenen WLANs kann theoretisch jeder im selben Netz mitlesen.",
+      "body": "Für Nachrichten reicht das meist. Für Bank, Mail und alles mit Passwort lieber das Mobilfunknetz nehmen – oder ein VPN, wenn du öfter unterwegs arbeitest.",
+      "action": "Wenn du unterwegs ins Bankkonto willst: Mobilfunk statt Café-WLAN."
+    },
+    {
+      "day": 8,
+      "kind": "quiz",
+      "motto": "Fundsache",
+      "title": "Dein Handy ist weg",
+      "lead": "Es liegt nicht in der Jackentasche, nicht auf dem Schreibtisch, nicht im Auto.",
+      "question": "Was ist der beste erste Schritt?",
+      "options": [
+        "Alle Freunde anrufen und fragen, ob sie es gesehen haben.",
+        "Über „Gerät suchen“ orten, sperren und im Zweifel löschen.",
+        "Sofort ein neues Handy kaufen."
+      ],
+      "correct": 1,
+      "explanation": "Orten und sperren geht von jedem Browser aus – bevor jemand an deine Konten, Fotos und Nachrichten kommt. Das Gerät lässt sich danach immer noch löschen.",
+      "action": "Richte „Gerät suchen“ heute ein, solange du dein Handy noch in der Hand hast."
+    },
+    {
+      "day": 9,
+      "kind": "tipp",
+      "motto": "Der nette Anruf",
+      "title": "Die IT ruft nie nach deinem Passwort",
+      "lead": "Wer dich unter Druck setzt, nach Passwörtern fragt oder eine schnelle Überweisung will, ist kein Kollege.",
+      "body": "Social Engineering nutzt nicht Technik, sondern Freundlichkeit und Zeitdruck. Die Stimme am Telefon kann gefälscht sein, die Nummer auch.",
+      "action": "Auflegen und unter der bekannten Nummer zurückrufen. Das ist nicht unhöflich, sondern Standard."
+    },
+    {
+      "day": 10,
+      "kind": "challenge",
+      "motto": "Kurz abgeschlossen",
+      "title": "Sperrbildschirm in 2 Minuten",
+      "lead": "Der teuerste Bildschirmschoner ist der ohne Sperre.",
+      "steps": [
+        "Öffne die Einstellungen deines Handys.",
+        "Stell die automatische Sperre auf 2 Minuten oder weniger.",
+        "Prüfe, ob eine PIN oder ein Fingerabdruck wirklich verlangt wird."
+      ],
+      "action": "Ein kurzer Blick aufs Display soll nicht dein ganzes Leben öffnen."
+    },
+    {
+      "day": 11,
+      "kind": "quiz",
+      "motto": "Absendercheck",
+      "title": "Der Teufel steckt nach dem @",
+      "lead": "Gefälschte Absender sehen auf den ersten Blick echt aus.",
+      "question": "Woran erkennst du eine gefälschte Adresse am ehesten?",
+      "options": [
+        "Am Logo der Firma.",
+        "An der genauen Domain hinter dem @.",
+        "An der Uhrzeit, zu der die Mail kam."
+      ],
+      "correct": 1,
+      "explanation": "Logos lassen sich kopieren, Domains nicht. „sparkasse-sicherheit.de“ ist nicht „sparkasse.de“ – und „paypa1.com“ ist nicht „paypal.com“.",
+      "action": "Bevor du auf einen Link klickst: einmal auf den Absender schauen, nicht nur auf den Namen."
+    },
+    {
+      "day": 12,
+      "kind": "tipp",
+      "motto": "Der unsichtbare Schlüssel",
+      "title": "Passkeys: Der Schlüssel, der nie geklaut wird",
+      "lead": "Ein Passkey verlässt dein Gerät nie. Es gibt nichts, was ein Angreifer auf einer fremden Seite eingeben könnte.",
+      "body": "Statt Passwort bestätigst du mit Fingerabdruck oder Gesicht. Immer mehr Konten unterstützen das – und es ist bequemer als Tippen.",
+      "action": "Schau in den Sicherheitseinstellungen deines wichtigsten Kontos nach „Passkey hinzufügen“."
+    },
+    {
+      "day": 13,
+      "kind": "challenge",
+      "motto": "Aufräumen",
+      "title": "Schließ eine alte Tür",
+      "lead": "Alte Konten sind offene Türen, an die sich niemand mehr erinnert.",
+      "steps": [
+        "Such in deinem Postfach nach „Willkommen bei“ oder „Konto erstellen“.",
+        "Finde ein Konto, das du seit Jahren nicht genutzt hast.",
+        "Lösche es – oder ändere wenigstens das Passwort."
+      ],
+      "action": "Ein Konto weniger ist ein Angriffsziel weniger."
+    },
+    {
+      "day": 14,
+      "kind": "quiz",
+      "motto": "Fundstück",
+      "title": "Ein USB-Stick im Parkplatz",
+      "lead": "Er liegt da, sieht neu aus, vielleicht mit einem Firmenlogo drauf.",
+      "question": "Was machst du damit?",
+      "options": [
+        "Am nächsten Rechner prüfen, was drauf ist.",
+        "Abgeben – aber auf keinen Fall einstecken.",
+        "Mitnehmen und später in Ruhe anschauen."
+      ],
+      "correct": 1,
+      "explanation": "USB-Sticks sind ein klassischer Weg für Schadsoftware. Genau auf die Neugier ist der Angriff gebaut – „mal schauen“ ist die gefährlichste Einstellung.",
+      "action": "Gefundene Datenträger gehören zur IT oder in den Müll – nicht in deinen Rechner."
+    },
+    {
+      "day": 15,
+      "kind": "tipp",
+      "motto": "Weniger ist mehr",
+      "title": "Was du nicht speicherst, kann nicht gestohlen werden",
+      "lead": "Jedes Formular fragt nach mehr, als es braucht. Du musst nicht alles beantworten.",
+      "body": "Datenminimierung klingt nach Datenschutz-Papier, ist aber Selbstschutz: Weniger gespeicherte Daten bedeuten weniger Schaden, wenn doch mal etwas passiert.",
+      "action": "Frag dich beim nächsten Formular: Braucht diese Firma mein Geburtsdatum wirklich?"
+    },
+    {
+      "day": 16,
+      "kind": "quiz",
+      "motto": "Browser oder Manager?",
+      "title": "Passwörter im Browser",
+      "lead": "Der Browser bietet an, Passwörter zu speichern. Ist das eine gute Idee?",
+      "question": "Wie ist das mit gespeicherten Browser-Passwörtern?",
+      "options": [
+        "Nie benutzen – sofort ausschalten.",
+        "Besser als überall dasselbe, ein Passwort-Manager ist aber die bessere Wahl.",
+        "Genauso gut wie ein Passwort-Manager."
+      ],
+      "correct": 1,
+      "explanation": "Der Browser-Speicher ist deutlich besser als ein Passwort für alles. Ein eigener Manager bietet mehr Kontrolle, bessere Warnungen und funktioniert geräteübergreifend.",
+      "action": "Wenn du noch überall dasselbe Passwort hast: heute ist ein guter Tag, damit anzufangen."
+    },
+    {
+      "day": 17,
+      "kind": "tipp",
+      "motto": "Paket-SMS",
+      "title": "Die SMS vom Paketdienst, die nie kam",
+      "lead": "Wer dich per SMS zu Zahlung oder Link drängt, will meist dein Geld.",
+      "body": "Diese Nachrichten kommen in Wellen und sehen täuschend echt aus. Der Link führt auf eine Seite, die deine Zugangsdaten oder Kartendaten will.",
+      "action": "Links aus SMS nie direkt öffnen. Such den Paketdienst selbst in der App oder im Browser."
+    },
+    {
+      "day": 18,
+      "kind": "quiz",
+      "motto": "Urlaubspost",
+      "title": "Zwei Wochen Strand",
+      "lead": "Du fliegst über die Feiertage weg. Wann postest du die Fotos?",
+      "question": "Was verrät am wenigsten über deine leere Wohnung?",
+      "options": [
+        "Live aus dem Strandcafé – die Freunde freuen sich.",
+        "Nach dem Urlaub, wenn du wieder zu Hause bist.",
+        "Am besten gar nichts posten."
+      ],
+      "correct": 1,
+      "explanation": "Live-Posts erzählen allen, dass niemand zu Hause ist. Nachher posten ist genauso schön – und deutlich klüger.",
+      "action": "Wenn du trotzdem live posten willst: stell die Sichtbarkeit auf „nur Freunde“ und vermeide genaue Ortsangaben."
+    },
+    {
+      "day": 19,
+      "kind": "challenge",
+      "motto": "Rechtecheck",
+      "title": "Warum will die Taschenlampe deine Kontakte?",
+      "lead": "Jede App sammelt nur, wofür du sie lässt – und viele fragen zu viel.",
+      "steps": [
+        "Öffne die Einstellungen deines Handys und such die App-Berechtigungen.",
+        "Geh die Liste der Apps durch, die auf Kontakte, Mikrofon oder Standort zugreifen.",
+        "Nimm drei Apps Rechte weg, die sie offensichtlich nicht brauchen."
+      ],
+      "action": "Du kannst Rechte später jederzeit wieder geben – aber nur, wenn du es willst."
+    },
+    {
+      "day": 20,
+      "kind": "tipp",
+      "motto": "Briefumschlag",
+      "title": "Verschlüsselung ist ein Umschlag",
+      "lead": "Ohne Verschlüsselung ist eine Nachricht eine Postkarte: Jeder auf dem Weg kann mitlesen.",
+      "body": "Bei einer verschlüsselten Festplatte ist es egal, ob der Laptop gestohlen wird – die Daten sind ohne dein Passwort nicht lesbar. Auf dem Mac heißt das FileVault, unter Windows BitLocker.",
+      "action": "Prüf heute, ob die Festplatte deines Rechners verschlüsselt ist. Es ist meistens nur ein Schalter."
+    },
+    {
+      "day": 21,
+      "kind": "quiz",
+      "motto": "Stimmen im Kopf",
+      "title": "Der Anruf, der nicht deine Tochter ist",
+      "lead": "Deine Tochter ruft an. Die Stimme klingt komisch, sie braucht sofort Geld.",
+      "question": "Was tust du?",
+      "options": [
+        "Sofort überweisen – es klingt wirklich wie sie.",
+        "Auflegen und unter ihrer bekannten Nummer zurückrufen.",
+        "Nach ihrem Geburtsdatum fragen."
+      ],
+      "correct": 1,
+      "explanation": "Stimmen lassen sich mit wenigen Sekunden Material täuschen. Eine Rückfrage über einen zweiten Kanal – die bekannte Nummer – entlarvt fast jeden Betrug.",
+      "action": "Vereinbare mit deiner Familie ein Codewort für den Notfall. Es kostet nichts und wirkt."
+    },
+    {
+      "day": 22,
+      "kind": "challenge",
+      "motto": "Melden statt löschen",
+      "title": "Phishing-Mails sind Geschenke",
+      "lead": "Eine gemeldete Phishing-Mail schützt alle anderen im Haus – eine gelöschte nur dich.",
+      "steps": [
+        "Wenn dir eine Mail verdächtig vorkommt: nicht klicken, nicht antworten.",
+        "Nutze die Melde-Funktion deines Mailprogramms oder schick sie an die IT.",
+        "Erzähl es weiter, wenn du glaubst, dass andere sie auch bekommen haben."
+      ],
+      "action": "Melde heute die nächste verdächtige Mail, statt sie nur zu löschen."
+    },
+    {
+      "day": 23,
+      "kind": "tipp",
+      "motto": "Wenn es passiert ist",
+      "title": "Schnell handeln schlägt verstecken",
+      "lead": "Passwort ändern, IT informieren, Bank anrufen. Tempo schlägt Scham.",
+      "body": "Passwort ändern, die IT informieren, bei der Bank anrufen. Scham hilft niemandem – Tempo schon. Je früher es jemand weiß, desto mehr lässt sich noch abfangen.",
+      "action": "Speichere heute die Nummer deiner IT-Hotline ins Handy. Im Ernstfall suchst du sie sonst."
+    },
+    {
+      "day": 24,
+      "kind": "challenge",
+      "motto": "Heiligabend",
+      "title": "24 Türchen, 24 kleine Schlösser",
+      "lead": "Passwort-Manager, 2FA, Updates, Backup – vier Gewohnheiten, die mehr bewirken als jede Firewall.",
+      "body": "Sicherheit ist selten ein großer Akt. Sie ist die Summe kleiner Entscheidungen: ein längeres Passwort, ein Update, ein zweiter Faktor, ein getestetes Backup.",
+      "action": "Such dir eine davon aus und mach sie zu deinem Vorsatz fürs neue Jahr.",
+      "closing": "Frohe Weihnachten!",
+      "steps": [
+        "Passwort-Manager: ein eigenes Passwort pro Seite.",
+        "2FA: ein zweiter Schlüssel für die wichtigsten Konten.",
+        "Updates: flicken, bevor jemand das Loch findet.",
+        "Backup: sichern, das sich auch öffnen lässt."
+      ]
+    }
+  ]
+}

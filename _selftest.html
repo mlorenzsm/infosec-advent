@@ -1,0 +1,74 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>selftest</title>
+<pre id="out">läuft…</pre>
+<script>
+const results = [];
+const ok = (name, cond, extra = "") => results.push((cond ? "✓ " : "✗ ") + name + (extra ? " — " + extra : ""));
+
+function load(query) {
+  return new Promise((resolve) => {
+    const f = document.createElement("iframe");
+    f.style.cssText = "width:1200px;height:760px;border:0";
+    f.src = "index.html" + query;
+    f.onload = () => setTimeout(() => resolve(f), 1500);
+    document.body.appendChild(f);
+  });
+}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+(async () => {
+  // 1) Quiz: falsche Antwort anklicken
+  let f = await load("?tur=2&auto=aus");
+  let d = f.contentDocument;
+  ok("Detail offen (tur=2)", !d.getElementById("detail").hidden);
+  const opts = d.querySelectorAll(".quiz-option");
+  ok("drei Antworten", opts.length === 3);
+  opts[0].click();
+  ok("falsche Antwort markiert", opts[0].classList.contains("is-wrong"));
+  ok("richtige Antwort markiert", opts[1].classList.contains("is-right"));
+  ok("Erklärung erscheint", /Druck, eine knappe Frist/.test(d.querySelector(".quiz-explain")?.textContent || ""));
+  ok("Optionen gesperrt", [...opts].every((o) => o.disabled));
+  f.remove();
+
+  // 2) Automatik: nach ~4 s öffnet sich ein Türchen von selbst
+  f = await load("?datum=2026-12-03");
+  d = f.contentDocument;
+  await sleep(4000);
+  const autoOpen = !d.getElementById("detail").hidden;
+  ok("Automatik öffnet ein Türchen", autoOpen);
+  if (autoOpen) {
+    const title = d.querySelector(".detail-title")?.textContent || "";
+    ok("Automatik zeigt heute (Tag 3)", /2FA/.test(title), title);
+  }
+  f.remove();
+
+  // 3) Zukunft: Tag 24 geschlossen
+  f = await load("?datum=2026-12-03&auto=aus");
+  d = f.contentDocument;
+  const doors = d.querySelectorAll(".door");
+  ok("24 Türen", doors.length === 24);
+  ok("Tag 3 offen", doors[2].getAttribute("aria-disabled") !== "true");
+  ok("Tag 4 zu", doors[3].getAttribute("aria-disabled") === "true");
+  ok("Tag 3 als heute markiert", doors[2].classList.contains("is-today"));
+  ok("Fortschritt 3/24", d.getElementById("bar").getAttribute("aria-valuenow") === "3");
+  doors[5].click();
+  ok("geschlossene Tür zeigt Hinweis", !d.getElementById("toast").hidden);
+  f.remove();
+
+  // 4) Vor dem Advent: alles zu
+  f = await load("?datum=2026-11-12&auto=aus");
+  d = f.contentDocument;
+  ok("November: alle Türen zu", [...d.querySelectorAll(".door")].every((x) => x.getAttribute("aria-disabled") === "true"));
+  ok("November: Hinweis auf den 1.12.", /1\. Dezember/.test(d.getElementById("hint").textContent));
+  f.remove();
+
+  // 5) Januar: Rückblick, alle offen
+  f = await load("?datum=2027-01-05&auto=aus");
+  d = f.contentDocument;
+  ok("Januar: alle Türen offen", [...d.querySelectorAll(".door")].every((x) => x.getAttribute("aria-disabled") !== "true"));
+  f.remove();
+
+  document.getElementById("out").textContent = results.join("\n");
+})();
+</script>
