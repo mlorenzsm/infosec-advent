@@ -12,6 +12,8 @@ Server, keine Datenbank, kein Build-Schritt.
 ![Raster](docs/board.png)
 ![Quiz](docs/quiz.png)
 
+**Live:** <https://mlorenzsm.github.io/infosec-advent/>
+
 ## Starten
 
 ```sh
@@ -247,6 +249,33 @@ Ohne Touch läuft die Automatik allein weiter.
 `fetch("content/advent.json")` schlägt unter `file://` an der
 Same-Origin-Regel fehl — die Seite bliebe leer. Der Server ist ein
 `python3 -m http.server`, also in Mint ohne Zusatzpaket vorhanden.
+
+## Veröffentlichen (GitHub Pages)
+
+Der Kalender läuft ohne Änderung auf GitHub Pages — alle Pfade sind relativ,
+`fetch("content/advent.json")` funktioniert auch unter dem Unterpfad
+`/infosec-advent/`.
+
+Eingerichtet ist das schon: Pages baut bei jedem Push auf `main` automatisch
+neu (Source: *Deploy from a branch*, Branch `main`, Ordner `/`). Ein Push ist
+also das Deploy:
+
+```sh
+git push
+```
+
+Prüfen:
+
+```sh
+gh api repos/<user>/infosec-advent/pages/builds/latest --jq .status
+```
+
+Nach etwa einer Minute ist die Änderung unter
+<https://mlorenzsm.github.io/infosec-advent/> sichtbar. Der Browser cached
+HTML und CSS kurz — im Zweifel mit `Ctrl+Shift+R` neu laden.
+
+Wichtig für den Kiosk: Die gehostete Seite braucht Internet. Der Kundenstopper
+läuft mit `tools/kiosk.sh` lokal und ist davon unabhängig.
 
 ## Lizenz
 
