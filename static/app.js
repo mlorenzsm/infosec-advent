@@ -491,6 +491,74 @@ function snow() {
   requestAnimationFrame(frame);
 }
 
+/* --- Listenansicht (?liste=1) ------------------------------------------ */
+/* Zum Korrekturlesen aller Texte auf einem Blick, ohne 24-mal zu klicken.
+ * Bewusst ohne Schnee und ohne Automatik: Es geht ums Lesen. */
+
+function renderList() {
+  const stage = document.querySelector(".stage");
+  document.querySelector("canvas")?.remove();
+  document.querySelector(".foot")?.remove();
+  document.querySelector(".masthead")?.remove();
+
+  const list = document.createElement("div");
+  list.className = "list";
+
+  const head = el("header", "list-head");
+  head.append(
+    el("p", "kicker", "Korrekturlesen · alle 24 Türchen"),
+    el("h1", "title", state.data.title || "Sicherheitskalender"),
+  );
+  const back = el("a", "list-back", "← Zurück zum Kalender");
+  back.href = location.pathname;
+  head.append(back);
+  list.append(head);
+
+  const grid = el("div", "list-grid");
+  for (const item of [...state.data.doors].sort((a, b) => a.day - b.day)) {
+    const card = el("article", "list-card");
+    const top = el("div", "list-top");
+    top.append(el("span", "list-num", String(item.day)),
+               el("span", "list-kind", KIND_LABEL[item.kind] || item.kind));
+    card.append(top);
+    card.append(el("p", "detail-motto", item.motto || ""));
+    card.append(el("h2", "list-title", item.title || ""));
+    card.append(el("p", "list-lead", item.lead || ""));
+    if (item.body) card.append(el("p", "list-body", item.body));
+
+    if (item.kind === "quiz") {
+      card.append(el("p", "list-q", item.question || ""));
+      const ol = el("ol", "list-options");
+      (item.options || []).forEach((text, i) => {
+        const li = el("li", i === item.correct ? "is-right" : "", text);
+        ol.append(li);
+      });
+      card.append(ol);
+      card.append(el("p", "list-explain", item.explanation || ""));
+    }
+    if (item.kind === "challenge") {
+      const ol = el("ol", "list-steps");
+      (item.steps || []).forEach((text) => ol.append(el("li", null, text)));
+      card.append(ol);
+    }
+    if (item.action) {
+      const act = el("p", "list-action");
+      act.append(el("strong", null, "Mach das "), document.createTextNode(item.action));
+      card.append(act);
+    }
+    if (item.closing) card.append(el("p", "list-closing", item.closing));
+    grid.append(card);
+  }
+  list.append(grid);
+
+  const foot = el("p", "list-foot",
+    "Texte ändern: content/advent.json — danach tools/check_content.py laufen lassen.");
+  list.append(foot);
+
+  stage.replaceChildren(list);
+  document.title = "Korrekturlesen — " + (state.data.title || "Sicherheitskalender");
+}
+
 /* --- Start ------------------------------------------------------------- */
 
 async function start() {
@@ -510,11 +578,19 @@ async function start() {
   const now = nowDate();
   state.todayDay = computeTodayDay(now);
   state.openDay = computeOpenDay(now, state.data.year);
+  // ?liste=1 zeigt alle 24 Türchen zum Korrekturlesen — unabhängig vom Datum.
+  if (params.get("liste")) state.openDay = 24;
 
   renderMasthead(state.data);
   renderBoard();
   updateFooter(now);
   updateClock(now);
+
+  if (params.get("liste")) {
+    renderList();
+    return;
+  }
+
   snow();
 
   if (params.get("tur")) {

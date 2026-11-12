@@ -7,6 +7,9 @@
 #
 # Von Hand:    tools/kiosk.sh
 # Probelauf:   tools/kiosk.sh --dry-run      (zeigt nur, was gestartet würde)
+# Testen:      tools/kiosk.sh --test [YYYY-MM-DD]
+#              (normales Fenster mit Adresszeile, Automatik aus, optional mit
+#               einem Datum — zum Durchklicken aller Türchen auf dem Gerät)
 # Automatisch: siehe deploy/adventkalender.desktop und README, Abschnitt Kiosk.
 
 set -u
@@ -17,7 +20,21 @@ URL="http://127.0.0.1:$PORT/"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/adventkalender"
 SERVER_PID=""
 DRY_RUN=0
-[ "${1:-}" = "--dry-run" ] && DRY_RUN=1
+TEST_DATE=""
+TEST_MODE=0
+for arg in "$@"; do
+  case $arg in
+    --dry-run) DRY_RUN=1 ;;
+    --test)    TEST_MODE=1 ;;
+    --test=*)  TEST_MODE=1; TEST_DATE=${arg#--test=} ;;
+    *)         # --test 2026-12-07
+               [ "$TEST_MODE" = 1 ] && TEST_DATE=$arg ;;
+  esac
+done
+if [ -n "$TEST_DATE" ] && ! printf '%s' "$TEST_DATE" | grep -Eq '^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$'; then
+  echo "Datum bitte als JJJJ-MM-TT angeben, z. B. --test 2026-12-07" >&2
+  exit 2
+fi
 
 # --- 1. Browser finden -----------------------------------------------------
 # Reihenfolge: ausdrücklich gesetzt (BROWSER=…), dann Chromium-Familie
@@ -91,6 +108,12 @@ MSG
 fi
 
 # --- 2. Flags je Browserfamilie --------------------------------------------
+if [ "$TEST_MODE" = 1 ]; then
+  QUERY="?auto=aus"
+  [ -n "$TEST_DATE" ] && QUERY="$QUERY&datum=$TEST_DATE"
+  URL="$URL$QUERY"
+fi
+
 if [ "$BROWSER_FAMILY" = "firefox" ]; then
   PROFILE="$CACHE/firefox-profile"
   if [ "$DRY_RUN" = 0 ]; then
@@ -107,19 +130,33 @@ user_pref("app.update.auto", false);
 user_pref("app.update.enabled", false);
 PREFS
   fi
-  FLAGS="-kiosk -no-remote -profile $PROFILE"
+  if [ "$TEST_MODE" = 1 ]; then
+    FLAGS="-no-remote -profile $PROFILE -new-window"
+  else
+    FLAGS="-kiosk -no-remote -profile $PROFILE"
+  fi
 else
   # Eigenes Profil: verhindert „Browser wurde nicht richtig beendet"-Dialoge
   # und Profil-Auswahl, wenn der Kiosk nach einem Absturz neu startet.
-  FLAGS="--kiosk --user-data-dir=$CACHE/chromium-profile
+  if [ "$TEST_MODE" = 1 ]; then
+    # Normales Fenster: Adresszeile sichtbar, damit man Parameter ausprobieren
+    # kann. Kiosk-Dialoge bleiben trotzdem abgeschaltet.
+    FLAGS="--user-data-dir=$CACHE/chromium-profile
 --no-first-run --no-default-browser-check --disable-infobars
 --disable-session-crashed-bubble --disable-features=Translate
 --password-store=basic --check-for-update-interval=31536000"
+  else
+    FLAGS="--kiosk --user-data-dir=$CACHE/chromium-profile
+--no-first-run --no-default-browser-check --disable-infobars
+--disable-session-crashed-bubble --disable-features=Translate
+--password-store=basic --check-for-update-interval=31536000"
+  fi
 fi
 
 if [ "$DRY_RUN" = 1 ]; then
   echo "Browser:  $BROWSER_BIN"
   echo "Familie:  $BROWSER_FAMILY"
+  echo "Modus:    $([ "$TEST_MODE" = 1 ] && echo Test || echo Kiosk)"
   echo "Flags:    $(echo $FLAGS)"
   echo "URL:      $URL"
   echo "Daten:    $CACHE"
@@ -153,14 +190,26 @@ trap cleanup EXIT INT TERM HUP
 # --- 4. Bildschirm anlassen ------------------------------------------------
 # Cinnamon schaltet nach ein paar Minuten in den Ruhezustand. xset wirkt nur
 # in der laufenden X-Sitzung; die dauerhafte Einstellung steht in der README.
-xset s off 2>/dev/null
-xset -dpms 2>/dev/null
-if command -v unclutter >/dev/null 2>&1; then
-  unclutter -idle 1 -root &
-  UNC_PID=$!
+# Im Testmodus nicht — ein kurzer Blick soll die Einstellungen nicht ändern.
+if [ "$TEST_MODE" = 0 ]; then
+  xset s off 2>/dev/null
+  xset -dpms 2>/dev/null
+  if command -v unclutter >/dev/null 2>&1; then
+    unclutter -idle 1 -root &
+    UNC_PID=$!
+  fi
 fi
 
-# --- 5. Browser im Kiosk ---------------------------------------------------
+# --- 5. Browser ------------------------------------------------------------
+# Testmodus: ein Fenster, kein Lock, kein Neustart — schließen beendet alles.
+if [ "$TEST_MODE" = 1 ]; then
+  echo "Testmodus: $URL"
+  echo "Türchen anklicken; schließen des Fensters beendet den Test."
+  # shellcheck disable=SC2086
+  "$BROWSER_BIN" $FLAGS "$URL"
+  exit 0
+fi
+
 # Nur ein Kiosk gleichzeitig: Ein zweiter Start würde den Browser nur als
 # weiteren Tab in den laufenden schicken und hier in einer Startschleife enden.
 LOCKDIR="${XDG_RUNTIME_DIR:-/tmp}/adventkalender-kiosk-$(id -u)"

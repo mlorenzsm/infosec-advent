@@ -69,6 +69,16 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok("Januar: alle Türen offen", [...d.querySelectorAll(".door")].every((x) => x.getAttribute("aria-disabled") !== "true"));
   f.remove();
 
+  // 6) Listenansicht: alle 24 Türchen, auch im November
+  f = await load("?liste=1&datum=2026-11-12");
+  d = f.contentDocument;
+  const cards = d.querySelectorAll(".list-card");
+  ok("Liste zeigt 24 Karten", cards.length === 24, String(cards.length));
+  ok("Liste im November trotzdem vollständig", cards.length === 24);
+  ok("Quiz-Lösung hervorgehoben", d.querySelectorAll(".list-options .is-right").length > 0);
+  ok("kein Raster in der Liste", d.querySelectorAll(".door").length === 0);
+  f.remove();
+
   document.getElementById("out").textContent = results.join("\n");
 })();
 </script>

@@ -29,16 +29,37 @@ es dafür `tools/kiosk.sh` — siehe [Kiosk](#kiosk-linux-mint).
 
 Bedienbar per Touch und Maus; mit Tastatur `←`/`→` blättern, `Esc` schließen.
 
-### Testen ohne Datumsreise
+### Türchen testen
+
+Der Kalender rechnet mit dem echten Datum — im November sind deshalb alle
+Türen zu. Zum Durchklicken gibt es drei Wege.
+
+**1. Auf dem Rechner (Adresszeile):**
 
 | Parameter | Wirkung |
 |---|---|
-| `?datum=2026-12-07` | So tun, als wäre der 7. Dezember |
-| `?auto=aus` | Automatik aus, nur Berührung öffnet |
-| `?tur=14` | Ein bestimmtes Türchen direkt zeigen |
+| `?datum=2026-12-07` | So tun, als wäre der 7. Dezember — Türen 1–7 offen, 7 ist „heute“ |
+| `?tur=14` | Ein bestimmtes Türchen direkt öffnen |
+| `?auto=aus` | Automatik aus, nur Klick öffnet |
+| `?liste=1` | Alle 24 Texte untereinander zum Korrekturlesen |
 
 Beispiele: <http://localhost:8099/?datum=2026-12-07&auto=aus> ·
-<http://localhost:8099/?tur=2>
+<http://localhost:8099/?tur=2> · <http://localhost:8099/?liste=1>
+
+**2. Auf dem Kundenstopper:** Der Kiosk hat keine Adresszeile, deshalb bringt
+`tools/kiosk.sh` einen Testmodus mit — normales Fenster, Automatik aus:
+
+```sh
+tools/kiosk.sh --test                 # alles offen, durchklicken
+tools/kiosk.sh --test 2026-12-07      # Stand 7. Dezember
+```
+
+Der Testmodus lässt Bildschirmschoner und Sperre in Ruhe. Fenster schließen
+beendet ihn. Ein zweiter Testmodus-Start während der Kiosk läuft, beendet den
+Kiosk nicht.
+
+**3. Automatisch:** `_selftest.html` prüft Quiz-Auswertung, Rotation,
+Datumszustände und die Listenansicht (siehe unten).
 
 ## Inhalte bearbeiten
 

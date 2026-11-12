@@ -534,3 +534,92 @@
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 }
+
+/* --- Listenansicht (?liste=1) ---------------------------------------------
+ * Korrekturlesen am Schreibtisch, nicht auf dem Display: Fließtext in
+ * Lesegröße, Raster je nach Fensterbreite. */
+@layer utilities {
+  .list {
+    display: grid;
+    gap: var(--s-5);
+    padding-bottom: var(--s-5);
+    user-select: text;
+  }
+  .list-head { display: grid; gap: var(--s-2); }
+  .list-back {
+    justify-self: start;
+    color: var(--accent);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    padding: var(--s-1) 0;
+  }
+  .list-back:hover { text-decoration: underline; }
+
+  .list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
+    gap: var(--s-4);
+  }
+  .list-card {
+    display: grid;
+    align-content: start;
+    gap: var(--s-2);
+    padding: var(--s-4);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  .list-top { display: flex; align-items: center; gap: var(--s-2); }
+  .list-num {
+    display: grid;
+    place-items: center;
+    min-width: calc(var(--u) * 2.6);
+    height: calc(var(--u) * 2.6);
+    border-radius: var(--r-sm);
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+  .list-kind {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .list-title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .list-lead { color: var(--snow); font-size: var(--text-md); }
+  .list-body, .list-q, .list-explain { color: var(--muted); font-size: var(--text-sm); }
+  .list-options, .list-steps {
+    margin: 0;
+    padding-left: var(--s-4);
+    display: grid;
+    gap: var(--s-1);
+    font-size: var(--text-sm);
+    color: var(--muted);
+  }
+  .list-options .is-right { color: var(--ok); font-weight: 600; }
+  .list-action {
+    font-size: var(--text-sm);
+    color: var(--snow);
+    background: var(--accent-soft);
+    border-left: calc(var(--u) * 0.25) solid var(--accent);
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-sm);
+  }
+  .list-action strong {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .list-closing { font-family: var(--font-display); font-size: var(--text-md); color: var(--accent); }
+  .list-foot { color: var(--faint); font-size: var(--text-sm); }
+}
