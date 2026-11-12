@@ -21,8 +21,9 @@ es dafür `tools/kiosk.sh` — siehe [Kiosk](#kiosk-linux-mint).
 
 ## Auf dem Display
 
-- **Geschlossen** ist jedes Türchen, dessen Tag noch nicht gekommen ist. Antippen
-  verrät, wann es aufgeht.
+- Jedes Türchen ist eine kleine Hütte: Satteldach mit Schnee, Holzwand, ein
+  Fenster mit der Tageszahl. Geschlossen ist das Fenster dunkel, geöffnet
+  leuchtet es warm — heute am hellsten.
 - **Heute** ist gold hinterlegt und wird zuerst gezeigt.
 - **Automatik**: Ohne Berührung öffnet sich alle ~35 s ein offenes Türchen und
   bleibt 30 s stehen. Ungelesene kommen zuerst dran. Wer den Bildschirm

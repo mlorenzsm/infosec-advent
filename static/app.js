@@ -145,10 +145,27 @@ function renderBoard() {
     }
     if (isToday) btn.classList.add("is-today");
 
+    // Eine kleine Holzhütte: Dach mit Schnee, Holzwand, Fenster mit der Zahl.
+    const hut = document.createElement("span");
+    hut.className = "hut";
+
+    const roof = document.createElement("span");
+    roof.className = "hut-roof";
+
+    const body = document.createElement("span");
+    body.className = "hut-body";
+
+    const window_ = document.createElement("span");
+    window_.className = "hut-window";
+
     const num = document.createElement("span");
     num.className = "door-day";
     num.textContent = String(day);
-    btn.appendChild(num);
+
+    window_.appendChild(num);
+    body.appendChild(window_);
+    hut.append(roof, body);
+    btn.appendChild(hut);
 
     btn.addEventListener("click", () => onDoorClick(day, item, open));
     li.appendChild(btn);

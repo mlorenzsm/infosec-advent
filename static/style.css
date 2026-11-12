@@ -154,89 +154,156 @@
   }
   .board > li { display: grid; min-height: 0; min-width: 0; }
 
+  /* Eine Tür ist eine kleine Hütte: Satteldach mit Schnee, Holzwand,
+   * Fenster mit der Zahl. Geschlossen ist das Fenster dunkel und kalt,
+   * geöffnet leuchtet es warm — das ist der ganze Zustandsunterschied. */
   .door {
     position: relative;
     display: grid;
-    place-items: center;
+    place-items: end center;
     width: 100%;
     height: 100%;
     min-height: 0;
-    border-radius: var(--r-md);
-    background: linear-gradient(160deg, var(--surface-2), var(--door));
-    box-shadow: var(--shadow-door);
+    padding: 0;
+    background: none;
+    border: 0;
     color: var(--door-ink);
-    overflow: hidden;
-    transition: transform 160ms ease, box-shadow 160ms ease, background 300ms ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .door::after {
-    /* Türgriff: eine schmale Klinke am rechten Rand */
+
+  .hut {
+    position: relative;
+    display: grid;
+    grid-template-rows: 32% 68%;
+    width: 100%;
+    height: 100%;
+    transition: transform 160ms ease;
+  }
+
+  /* --- Dach -------------------------------------------------------------- */
+  /* Schnee liegt auf den Schrägen: eine weiße Dreiecksfläche, darauf das
+   * Holzdach leicht eingerückt — so bleibt an beiden Kanten Schnee stehen. */
+  .hut-roof {
+    position: relative;
+    background: linear-gradient(180deg, #EAF2ED, #C4D5CE);
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  }
+  /* Holzdach sitzt eingerückt unter dem Schnee: an First und Traufen bleibt
+   * ein weißer Saum stehen. Oben mehr, unten weniger — so sieht es nach
+   * Schnee aus und nicht nach einem Rahmen. */
+  .hut-roof::after {
     content: "";
     position: absolute;
-    right: 8%;
-    top: 50%;
-    width: calc(var(--u) * 0.4);
-    height: calc(var(--u) * 2.2);
-    margin-top: calc(var(--u) * -1.1);
-    border-radius: 999px;
-    background: currentColor;
-    opacity: 0.28;
+    inset: 18% 4.5% 0 4.5%;
+    background: linear-gradient(180deg, #8E4C3D, #6A3428);
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
   }
-  .door:not([aria-disabled="true"]):hover { transform: translateY(calc(var(--u) * -0.2)); box-shadow: var(--shadow-lift); }
-  .door:not([aria-disabled="true"]):active { transform: scale(0.97); }
-  .door[aria-disabled="true"]:hover { box-shadow: 0 0 0 1px var(--line), var(--shadow-door); }
+
+  /* --- Wand -------------------------------------------------------------- */
+  .hut-body {
+    position: relative;
+    justify-self: center;
+    width: 88%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    border-radius: 0 0 calc(var(--u) * 0.35) calc(var(--u) * 0.35);
+    /* Holzbohlen: feine senkrechte Fugen */
+    background:
+      repeating-linear-gradient(90deg, rgb(0 0 0 / 0.16) 0 1px, transparent 1px calc(var(--u) * 1.1)),
+      linear-gradient(180deg, #7A4534, #5C3125);
+    box-shadow: inset 0 calc(var(--u) * 0.5) calc(var(--u) * 1) rgb(0 0 0 / 0.25),
+                0 calc(var(--u) * 0.35) calc(var(--u) * 0.8) rgb(0 0 0 / 0.35);
+  }
+
+  /* --- Fenster ----------------------------------------------------------- */
+  .hut-window {
+    display: grid;
+    place-items: center;
+    /* Die Ziffer sitzt mittig im Fenster; das Kreuz bleibt dahinter. */
+    width: 56%;
+    aspect-ratio: 1;
+    border-radius: calc(var(--u) * 0.35);
+    background: linear-gradient(180deg, #22323B, #16232A);
+    border: calc(var(--u) * 0.12) solid #4A2A20;
+    color: #93AAB3;
+    box-shadow: inset 0 0 calc(var(--u) * 0.6) rgb(0 0 0 / 0.6);
+    transition: background 400ms ease, color 400ms ease, box-shadow 400ms ease;
+  }
+  /* Fensterkreuz */
+  .hut-window::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, transparent calc(50% - 1px), rgb(74 42 32 / 0.9) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+      linear-gradient(180deg, transparent calc(50% - 1px), rgb(74 42 32 / 0.9) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px));
+    pointer-events: none;
+  }
+  .hut-window { position: relative; }
 
   .door-day {
+    position: relative;
+    z-index: 1;
     font-family: var(--font-mono);
-    font-size: var(--text-xl);
+    /* Füllt das Fenster, bleibt aber bei zweistelligen Zahlen im Rahmen. */
+    font-size: clamp(0.85rem, 3.1svmin, 2.4rem);
     font-weight: 600;
     letter-spacing: -0.03em;
     line-height: 1;
     font-variant-numeric: tabular-nums;
   }
 
-  /* geöffnet */
-  .door.is-open {
-    background: linear-gradient(160deg, #2a3524, #202a20);
-    color: var(--accent);
-    box-shadow: inset 0 0 0 calc(var(--u) * 0.08) color-mix(in oklab, var(--accent) 18%, transparent),
-                inset 0 calc(var(--u) * 0.5) calc(var(--u) * 1.2) rgb(232 184 75 / 0.07),
-                var(--shadow-door);
+  /* --- Zustände ---------------------------------------------------------- */
+  /* offen: das Fenster leuchtet warm */
+  .door.is-open .hut-window {
+    background: linear-gradient(180deg, #FFD98A, #E8A93F);
+    color: #3A2405;
+    box-shadow: 0 0 calc(var(--u) * 1.4) rgb(255 196 92 / 0.55),
+                inset 0 0 calc(var(--u) * 0.4) rgb(255 255 255 / 0.35);
   }
-  .door.is-open .door-day { color: var(--accent); }
-  .door.is-open::after { opacity: 0; }
-
-  /* heute: der einzige pulsierende Punkt auf dem Bildschirm */
-  .door.is-today {
-    background: linear-gradient(160deg, var(--accent), #c9972f);
-    color: var(--accent-ink);
-    box-shadow: 0 0 0 calc(var(--u) * 0.25) rgb(232 184 75 / 0.18), var(--shadow-lift);
-    animation: today-pulse 3.2s ease-in-out infinite;
+  .door.is-open .hut-window::before {
+    background:
+      linear-gradient(90deg, transparent calc(50% - 1px), rgb(120 70 20 / 0.55) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+      linear-gradient(180deg, transparent calc(50% - 1px), rgb(120 70 20 / 0.55) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px));
   }
-  .door.is-today .door-day { color: var(--accent-ink); }
-  .door.is-today::after { opacity: 0.35; }
 
-  /* Tür mit Inhalt, der noch verschlossen ist: dezente Schneekante */
-  .door.is-future {
-    background: linear-gradient(160deg, #1a2e27, #14231e);
-    color: #93a99d;
+  /* heute: das hellste Licht im Dorf */
+  .door.is-today .hut-window {
+    background: linear-gradient(180deg, #FFF3C4, #FFC94F);
+    color: #3A2405;
+    box-shadow: 0 0 calc(var(--u) * 2.2) rgb(255 214 120 / 0.85),
+                0 0 calc(var(--u) * 0.6) rgb(255 255 255 / 0.5);
+    animation: window-glow 3.2s ease-in-out infinite;
   }
-  .door.is-future::after { opacity: 0.18; }
 
-  /* neu geöffnet: kurzer Schein */
-  .door.is-new { animation: door-open 900ms ease both; }
+  /* geschlossen: kein Licht, Zahl kaum sichtbar */
+  .door.is-future .hut-body {
+    background:
+      repeating-linear-gradient(90deg, rgb(0 0 0 / 0.14) 0 1px, transparent 1px calc(var(--u) * 1.1)),
+      linear-gradient(180deg, #5B3A30, #432A23);
+  }
+  .door.is-future .hut-roof {
+    background: linear-gradient(180deg, #EEF5F1, #D6E2DC);
+  }
+
+  .door:not([aria-disabled="true"]):hover .hut { transform: translateY(calc(var(--u) * -0.3)); }
+  .door:not([aria-disabled="true"]):active .hut { transform: scale(0.96); }
+
+  /* neu geöffnet: kurzer Lichtschub */
+  .door.is-new .hut-window { animation: window-light 1200ms ease both; }
 
   /* Sonderfall: Türchen außerhalb des Advents (1.–24. Dez.) */
   .door.is-muted { opacity: 0.38; }
 
-  @keyframes today-pulse {
-    0%, 100% { box-shadow: 0 0 0 calc(var(--u) * 0.25) rgb(232 184 75 / 0.18), var(--shadow-lift); }
-    50%      { box-shadow: 0 0 0 calc(var(--u) * 0.65) rgb(232 184 75 / 0.10), var(--shadow-lift); }
+  @keyframes window-glow {
+    0%, 100% { box-shadow: 0 0 calc(var(--u) * 2.2) rgb(255 214 120 / 0.85), 0 0 calc(var(--u) * 0.6) rgb(255 255 255 / 0.5); }
+    50%      { box-shadow: 0 0 calc(var(--u) * 3.4) rgb(255 214 120 / 0.55), 0 0 calc(var(--u) * 1.0) rgb(255 255 255 / 0.35); }
   }
-  @keyframes door-open {
-    0%   { transform: scale(1); }
-    30%  { transform: scale(1.06); box-shadow: 0 0 0 calc(var(--u) * 1.2) rgb(232 184 75 / 0.35); }
-    100% { transform: scale(1); }
+  @keyframes window-light {
+    0%   { filter: brightness(1); }
+    25%  { filter: brightness(1.9); }
+    100% { filter: brightness(1); }
   }
 
   .board-error {
@@ -516,7 +583,7 @@
       gap: var(--s-2);
     }
     .board > li { aspect-ratio: 1 / 0.8; }
-    .door-day { font-size: var(--text-lg); }
+    .door-day { font-size: clamp(0.8rem, 4.2svmin, 1.6rem); }
     .title {
       font-size: var(--text-xl);
       /* „Informationssicherheit" hat keine Trennstelle und passt hier nicht
