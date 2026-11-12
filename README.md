@@ -117,6 +117,7 @@ static/fonts/         Geist, Geist Mono, Bricolage Grotesque (OFL)
 tools/kiosk.sh        Server + Chromium im Vollbild, Neustart bei Absturz
 tools/install-kiosk.sh  Autostart einrichten/entfernen
 tools/check_content.py
+tools/screenshots.sh  README-Bilder neu erzeugen
 deploy/               Autostart-Vorlage (.desktop)
 _selftest.html        Browsertests, s. u.
 ```
@@ -138,6 +139,10 @@ python3 -m http.server 8099 &          # Server muss laufen
 `_selftest.html` prüft Quiz-Auswertung, Automatik, Datumszustände (November,
 Dezember, Januar) und den Fortschrittsbalken. Die Datei ist nur zum Testen da
 und wird nicht ausgeliefert, wenn der Webserver nur `index.html` bedient.
+
+Die Bilder in dieser README erzeugt `tools/screenshots.sh`. Wichtig ist dort
+`--force-prefers-reduced-motion`: Ohne das Flag landet die Aufnahme mitten in
+der Einblend-Animation der Detailkarte und zeigt sie halb transparent.
 
 ## Kiosk (Linux Mint)
 
