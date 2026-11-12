@@ -20,6 +20,15 @@ fi
 
 chmod +x "$DIR/tools/kiosk.sh"
 mkdir -p "$(dirname "$TARGET")"
+
+# Welcher Browser würde starten? Besser jetzt erfahren als am 1. Dezember,
+# wenn der Bildschirm mit dem Desktop statt dem Kalender dasteht.
+if ! "$DIR/tools/kiosk.sh" --dry-run >/dev/null 2>&1; then
+  echo "Kein Browser gefunden — Autostart wird nicht eingerichtet." >&2
+  "$DIR/tools/kiosk.sh" --dry-run >&2 || true
+  exit 1
+fi
+"$DIR/tools/kiosk.sh" --dry-run | sed -n '1,2p'
 sed "s|__REPO__|$DIR|g" "$DIR/deploy/adventkalender.desktop" > "$TARGET"
 echo "Autostart eingerichtet: $TARGET"
 echo "Nächster Login startet den Kalender im Vollbild."

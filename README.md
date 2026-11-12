@@ -116,9 +116,22 @@ sudo apt install chromium unclutter
 tools/install-kiosk.sh
 ```
 
-Mint liefert Chromium als Snap aus. `tools/kiosk.sh` findet auch
-`google-chrome` oder `brave-browser`, falls Chromium fehlt oder Snap
-unerwünscht ist.
+`tools/kiosk.sh` sucht selbst nach einem Browser — in dieser Reihenfolge:
+
+1. `BROWSER=/pfad/zum/browser` (wenn gesetzt)
+2. Chromium-Familie: `chromium`, `chromium-browser`, `google-chrome`,
+   `brave-browser`, `microsoft-edge`, `vivaldi` — auch als Snap, Flatpak
+   und unter `/Applications` (macOS)
+3. Firefox / Firefox ESR (Mint-Standard)
+
+Welcher Browser starten würde, ohne ihn wirklich zu öffnen:
+
+```sh
+tools/kiosk.sh --dry-run
+```
+
+Kommt „Kein Browser gefunden“, fehlt Chromium — `install-kiosk.sh` bricht dann
+ab, statt einen Autostart einzurichten, der am 1. Dezember nichts zeigt.
 
 `install-kiosk.sh` legt `~/.config/autostart/adventkalender.desktop` an und
 schaltet in Cinnamon Bildschirmschoner, Standby und automatische Sperre ab.
@@ -139,9 +152,16 @@ tools/kiosk.sh
 ```
 
 Das Skript startet den lokalen Server auf Port 8099 (nur auf 127.0.0.1
-gebunden), öffnet Chromium im Kiosk-Modus und lässt ihn in einer Schleife
-laufen. Anderer Port: `PORT=8123 tools/kiosk.sh`. Anderer Browser:
-`BROWSER=google-chrome tools/kiosk.sh`.
+gebunden), öffnet den gefundenen Browser im Kiosk-Modus und lässt ihn in einer
+Schleife laufen. Ein zweiter Start bricht ab, solange der erste läuft
+(„Der Kiosk läuft bereits“) — beenden mit `kill <PID>`, die PID steht auch in
+`/tmp/adventkalender-kiosk-<uid>/pid`.
+
+Anderer Port: `PORT=8123 tools/kiosk.sh`. Anderer Browser:
+`BROWSER=firefox tools/kiosk.sh`.
+
+Browser-Profil und Firefox-Einstellungen liegen unter
+`~/.cache/adventkalender/` — löschen ist jederzeit gefahrlos.
 
 ### Alternative: nur ein Tab im normalen Browser
 
