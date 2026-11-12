@@ -9,9 +9,6 @@ Server, keine Datenbank, kein Build-Schritt.
 > HTML/CSS/JS, no build step, German content, ships with a Linux kiosk
 > launcher.
 
-Die Überschrift ist der ganze Kopf — bewusst ohne Kicker und Subline. Auf drei
-Meter zählt nur sie; alles Weitere steht in den Türchen.
-
 ![Raster](docs/board.png)
 ![Quiz](docs/quiz.png)
 
