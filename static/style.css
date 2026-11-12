@@ -109,7 +109,9 @@
     min-height: 100svh;
     height: 100svh;
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    /* Kopf · Lichterkette · Dorf · Fuß. Die Kette bekommt ihre eigene Zeile,
+     * sonst landet das Board in einer impliziten auto-Zeile und läuft über. */
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
     /* Grid-Kinder haben min-width:auto — ohne das schiebt ein langer Text
      * die ganze Seite breiter als den Bildschirm. */
     grid-template-columns: minmax(0, 1fr);
@@ -138,6 +140,35 @@
     /* Kein max-width: Der Titel bricht an der Wortgrenze um
      * („24 Tage" / „Informationssicherheit") statt mitten im Wort. */
     text-wrap: balance;
+  }
+
+  /* --- Lichterkette ----------------------------------------------------- */
+  /* Zwei Ketten hängen über dem Dorf. Die Kurve zeichnet app.js in SVG,
+   * die Birnen sind HTML-Punkte darüber — so bleiben sie rund und blinken
+   * unabhängig voneinander. */
+  .garland {
+    position: relative;
+    /* Genug Höhe für einen sichtbaren Durchhang: Bei 1280 × 800 sind das
+     * 96 px, auf dem Kiosk entsprechend mehr. */
+    height: clamp(3rem, 12svmin, 9rem);
+    pointer-events: none;
+    /* Die unteren Birnen hängen leicht in den Rand des Rasters hinein. */
+    margin-bottom: calc(var(--u) * -0.6);
+    overflow: visible;
+  }
+  .garland svg { display: block; width: 100%; height: 100%; }
+  .bulb {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle at 35% 30%, #FFF6D8, #FFC96B 55%, #C98A2A);
+    box-shadow: 0 0 calc(var(--u) * 0.9) rgb(255 205 110 / 0.75);
+    animation: bulb-twinkle 2.8s ease-in-out infinite;
+  }
+
+  @keyframes bulb-twinkle {
+    0%, 100% { opacity: 0.45; box-shadow: 0 0 calc(var(--u) * 0.4) rgb(255 205 110 / 0.35); }
+    50%      { opacity: 1;    box-shadow: 0 0 calc(var(--u) * 1.2) rgb(255 215 130 / 0.9); }
   }
 
   /* --- Raster ----------------------------------------------------------- */
@@ -179,6 +210,12 @@
     height: 100%;
     transition: transform 160ms ease;
   }
+
+  /* Drei Dachhöhen im Wechsel — ein Dorf, kein Stempelraster. Der Anteil
+   * geht zu Lasten der Wand, die Hütte bleibt gleich hoch. */
+  .hut[data-roof="1"] { grid-template-rows: 26% 74%; }
+  .hut[data-roof="2"] { grid-template-rows: 32% 68%; }
+  .hut[data-roof="3"] { grid-template-rows: 39% 61%; }
 
   /* --- Dach -------------------------------------------------------------- */
   /* Schnee liegt auf den Schrägen: eine weiße Dreiecksfläche, darauf das
@@ -285,6 +322,48 @@
   }
   .door.is-future .hut-roof {
     background: linear-gradient(180deg, #EEF5F1, #D6E2DC);
+  }
+
+  /* --- Schild über Tür 24 ----------------------------------------------- */
+  /* Ein kleines Sternenschild über dem Dach markiert den Heiligabend. Es
+   * sitzt über der Hütte, nicht in ihr — deshalb absolut im Türfeld. */
+  /* Das Schild hängt seitlich am Dachfirst — dort ist im Raster Platz, ohne
+   * in die Hütte der Reihe darüber zu ragen. */
+  .hut-sign {
+    position: absolute;
+    top: calc(var(--u) * 0.15);
+    right: calc(var(--u) * 0.25);
+    display: grid;
+    place-items: center;
+    width: calc(var(--u) * 2.2);
+    height: calc(var(--u) * 2.2);
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #FFF3C4, #E8B84B 60%, #B8862F);
+    color: #4A2A20;
+    font-size: calc(var(--u) * 1.15);
+    line-height: 1;
+    box-shadow: 0 0 calc(var(--u) * 1.4) rgb(255 205 110 / 0.8),
+                0 calc(var(--u) * 0.25) calc(var(--u) * 0.5) rgb(0 0 0 / 0.4);
+    animation: sign-sway 4.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  /* Kleine Aufhängung: zwei Fäden zum Dachfirst */
+  /* Aufhängung: ein kurzer Faden nach oben links zum Dach. */
+  .hut-sign::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--u) * -0.7);
+    left: 50%;
+    width: 1px;
+    height: calc(var(--u) * 0.7);
+    background: rgb(200 170 120 / 0.5);
+    transform-origin: bottom center;
+    transform: rotate(14deg);
+  }
+
+  @keyframes sign-sway {
+    0%, 100% { transform: rotate(-4deg); }
+    50%      { transform: rotate(4deg); }
   }
 
   .door:not([aria-disabled="true"]):hover .hut { transform: translateY(calc(var(--u) * -0.3)); }
@@ -571,7 +650,7 @@
       padding: var(--s-4) var(--s-3) var(--s-3);
       min-height: 0;
       height: auto;
-      grid-template-rows: auto auto auto;
+      grid-template-rows: auto auto auto auto;
     }
     .detail { padding: var(--s-3); }
     .detail-card { gap: var(--s-4); padding: var(--s-4); }
@@ -584,6 +663,13 @@
     }
     .board > li { aspect-ratio: 1 / 0.8; }
     .door-day { font-size: clamp(0.8rem, 4.2svmin, 1.6rem); }
+    .hut-sign {
+      width: calc(var(--u) * 1.7);
+      height: calc(var(--u) * 1.7);
+      font-size: calc(var(--u) * 0.9);
+      top: calc(var(--u) * 0.1);
+      right: calc(var(--u) * 0.1);
+    }
     .title {
       font-size: var(--text-xl);
       /* „Informationssicherheit" hat keine Trennstelle und passt hier nicht

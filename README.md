@@ -24,6 +24,8 @@ es dafür `tools/kiosk.sh` — siehe [Kiosk](#kiosk-linux-mint).
 - Jedes Türchen ist eine kleine Hütte: Satteldach mit Schnee, Holzwand, ein
   Fenster mit der Tageszahl. Geschlossen ist das Fenster dunkel, geöffnet
   leuchtet es warm — heute am hellsten.
+- Über dem Dorf hängen zwei Lichterketten mit blinkenden Birnen; die Dächer
+  haben drei Höhen im Wechsel, und über Tür 24 hängt ein Sternenschild.
 - **Heute** ist gold hinterlegt und wird zuerst gezeigt.
 - **Automatik**: Ohne Berührung öffnet sich alle ~35 s ein offenes Türchen und
   bleibt 30 s stehen. Ungelesene kommen zuerst dran. Wer den Bildschirm

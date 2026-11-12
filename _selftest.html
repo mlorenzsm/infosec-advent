@@ -77,6 +77,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok("Liste im November trotzdem vollständig", cards.length === 24);
   ok("Quiz-Lösung hervorgehoben", d.querySelectorAll(".list-options .is-right").length > 0);
   ok("kein Raster in der Liste", d.querySelectorAll(".door").length === 0);
+  ok("keine Lichterkette in der Liste", d.querySelectorAll(".garland").length === 0);
   f.remove();
 
   // 7) Testmodus ?alle=1: alle offen, bleibt auch nach mehreren Ticks offen
@@ -91,6 +92,18 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok("?alle=1: Türchen öffnet sich", !d.getElementById("detail").hidden);
   ok("?alle=1: richtiges Türchen (5)", /Passwortschule|Länge schlägt/.test(
      d.querySelector(".detail-card")?.textContent || ""));
+  f.remove();
+
+  // 8) Dorf-Details: Dachhöhen wechseln, Tür 24 hat ein Schild, Birnen hängen
+  f = await load("?alle=1&auto=aus");
+  d = f.contentDocument;
+  const roofs = new Set([...d.querySelectorAll(".hut")].map((h) => h.dataset.roof));
+  ok("drei Dachhöhen im Dorf", roofs.size === 3, [...roofs].join(","));
+  ok("genau ein Schild (Tür 24)", d.querySelectorAll(".hut-sign").length === 1);
+  ok("Schild hängt an Tür 24",
+     !!d.querySelector('.door[data-day="24"] .hut-sign'));
+  ok("Lichterkette mit Birnen", d.querySelectorAll(".bulb").length > 8,
+     String(d.querySelectorAll(".bulb").length));
   f.remove();
 
   document.getElementById("out").textContent = results.join("\n");

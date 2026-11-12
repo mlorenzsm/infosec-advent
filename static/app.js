@@ -148,6 +148,9 @@ function renderBoard() {
     // Eine kleine Holzhütte: Dach mit Schnee, Holzwand, Fenster mit der Zahl.
     const hut = document.createElement("span");
     hut.className = "hut";
+    // Drei Dachhöhen im Wechsel, deterministisch aus dem Tag: Das Dorf wirkt
+    // gewachsen statt gestempelt, bleibt aber bei jedem Laden gleich.
+    hut.dataset.roof = String((day % 3) + 1);
 
     const roof = document.createElement("span");
     roof.className = "hut-roof";
@@ -165,6 +168,16 @@ function renderBoard() {
     window_.appendChild(num);
     body.appendChild(window_);
     hut.append(roof, body);
+
+    if (day === 24) {
+      // Schild über dem Dach: markiert den Heiligabend-Hütte im Dorf.
+      const sign = document.createElement("span");
+      sign.className = "hut-sign";
+      sign.setAttribute("aria-hidden", "true");
+      sign.textContent = "★";
+      hut.appendChild(sign);
+    }
+
     btn.appendChild(hut);
 
     btn.addEventListener("click", () => onDoorClick(day, item, open));
@@ -510,6 +523,84 @@ function snow() {
   requestAnimationFrame(frame);
 }
 
+/* --- Lichterkette ------------------------------------------------------ */
+/* Zwei durchhängende Ketten über dem Dorf. Gezeichnet in echten Pixeln statt
+ * mit CSS: So bleiben die Birnen rund und die Kette hängt glaubwürdig durch.
+ * Gezeichnet wird nur einmal je Größe; die Birnen blinken über CSS. */
+
+function drawGarland() {
+  const host = $("garland");
+  if (!host) return;
+  const width = host.clientWidth;
+  const height = host.clientHeight;
+  if (!width || !height) return;
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  // Echte Pixel statt einer 100er-Höhe: sonst wird der Durchhang auf die
+  // flache Leiste gestaucht und die Kette wirkt schnurgerade.
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute("width", "100%");
+  svg.setAttribute("height", "100%");
+
+  const bulbSize = Math.max(6, Math.min(14, width / 85));
+
+  // Zwei Ketten, die sich nicht kreuzen: die hintere hängt höher und
+  // flacher, die vordere tiefer und stärker durch.
+  // sag ist der Abstand von der Aufhängung bis zum tiefsten Punkt. Bei einer
+  // quadratischen Bézier liegt die Kurve bei der halben Kontrollpunkt-Höhe,
+  // deshalb wird der Kontrollpunkt doppelt so tief gesetzt.
+  // Die zweite Kette hängt vollständig unter der ersten — gleiche Aufhängung
+  // an den Rändern würde sie in der Mitte kreuzen und wie ein X wirken.
+  const chains = [
+    { from: 0.02, to: 0.98, top: height * 0.06, sag: height * 0.50, count: 10 },
+    { from: 0.08, to: 0.92, top: height * 0.24, sag: height * 0.68, count: 8 },
+  ];
+
+  const bulbs = [];
+  for (const c of chains) {
+    const x0 = width * c.from;
+    const x1 = width * c.to;
+    const cx = (x0 + x1) / 2;
+    const y = c.top;
+    const bottom = y + c.sag * 2;
+    const d = `M ${x0} ${y} Q ${cx} ${bottom} ${x1} ${y}`;
+
+    const path = document.createElementNS(NS, "path");
+    path.setAttribute("d", d);
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", "rgb(150 170 158 / 0.45)");
+    path.setAttribute("stroke-width", "1.5");
+    svg.appendChild(path);
+
+    // Birnen auf der quadratischen Bézier verteilen
+    for (let i = 0; i < c.count; i++) {
+      const t = (i + 0.5) / c.count;
+      const mt = 1 - t;
+      bulbs.push({
+        x: mt * mt * x0 + 2 * mt * t * cx + t * t * x1,
+        y: mt * mt * y + 2 * mt * t * bottom + t * t * y,
+        i: bulbs.length,
+      });
+    }
+  }
+
+  // Birnen als HTML-Punkte über dem SVG: So bleiben sie rund.
+  host.replaceChildren(svg);
+  for (const b of bulbs) {
+    const dot = document.createElement("span");
+    dot.className = "bulb";
+    dot.style.left = `${b.x}px`;
+    dot.style.top = `${b.y}px`;
+    dot.style.width = `${bulbSize}px`;
+    dot.style.height = `${bulbSize}px`;
+    // Unregelmäßiges Blinken: jede Birne hat ihre eigene Phase.
+    dot.style.animationDelay = `${(b.i * 0.37) % 3}s`;
+    dot.style.animationDuration = `${2.4 + (b.i % 4) * 0.45}s`;
+    host.appendChild(dot);
+  }
+}
+
 /* --- Listenansicht (?liste=1) ------------------------------------------ */
 /* Zum Korrekturlesen aller Texte auf einem Blick, ohne 24-mal zu klicken.
  * Bewusst ohne Schnee und ohne Automatik: Es geht ums Lesen. */
@@ -517,6 +608,7 @@ function snow() {
 function renderList() {
   const stage = document.querySelector(".stage");
   document.querySelector("canvas")?.remove();
+  document.querySelector(".garland")?.remove();
   document.querySelector(".foot")?.remove();
   document.querySelector(".masthead")?.remove();
 
@@ -613,6 +705,7 @@ async function start() {
   }
 
   snow();
+  drawGarland();
 
   if (params.get("tur")) {
     const forced = Number(params.get("tur"));
@@ -624,6 +717,12 @@ async function start() {
   setInterval(tick, 1000);
   tick();
 }
+
+let garlandTimer = null;
+addEventListener("resize", () => {
+  clearTimeout(garlandTimer);
+  garlandTimer = setTimeout(drawGarland, 150);
+});
 
 /* Eingaben, die die Automatik pausieren und den Dialog schließen. */
 addEventListener("pointerdown", () => pauseAuto(), { passive: true });
