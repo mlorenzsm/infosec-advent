@@ -79,6 +79,20 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok("kein Raster in der Liste", d.querySelectorAll(".door").length === 0);
   f.remove();
 
+  // 7) Testmodus ?alle=1: alle offen, bleibt auch nach mehreren Ticks offen
+  f = await load("?alle=1&auto=aus");
+  d = f.contentDocument;
+  await sleep(2500);   // mehrere tick()-Läufe abwarten
+  const alleDoors = [...d.querySelectorAll(".door")];
+  ok("?alle=1: alle 24 offen", alleDoors.every((x) => x.getAttribute("aria-disabled") !== "true"),
+     String(alleDoors.filter((x) => x.getAttribute("aria-disabled") !== "true").length));
+  ok("?alle=1 bleibt nach Ticks offen", alleDoors.every((x) => !x.classList.contains("is-future")));
+  alleDoors[4].click();
+  ok("?alle=1: Türchen öffnet sich", !d.getElementById("detail").hidden);
+  ok("?alle=1: richtiges Türchen (5)", /Passwortschule|Länge schlägt/.test(
+     d.querySelector(".detail-card")?.textContent || ""));
+  f.remove();
+
   document.getElementById("out").textContent = results.join("\n");
 })();
 </script>

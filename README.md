@@ -41,18 +41,25 @@ Türen zu. Zum Durchklicken gibt es drei Wege.
 | `?datum=2026-12-07` | So tun, als wäre der 7. Dezember — Türen 1–7 offen, 7 ist „heute“ |
 | `?tur=14` | Ein bestimmtes Türchen direkt öffnen |
 | `?auto=aus` | Automatik aus, nur Klick öffnet |
+| `?alle=1` | Alle 24 Türchen offen, unabhängig vom Datum — zum Durchklicken |
 | `?liste=1` | Alle 24 Texte untereinander zum Korrekturlesen |
 
 Beispiele: <http://localhost:8099/?datum=2026-12-07&auto=aus> ·
-<http://localhost:8099/?tur=2> · <http://localhost:8099/?liste=1>
+<http://localhost:8099/?tur=2> · <http://localhost:8099/?alle=1> ·
+<http://localhost:8099/?liste=1>
 
 **2. Auf dem Kundenstopper:** Der Kiosk hat keine Adresszeile, deshalb bringt
 `tools/kiosk.sh` einen Testmodus mit — normales Fenster, Automatik aus:
 
 ```sh
-tools/kiosk.sh --test                 # alles offen, durchklicken
+tools/kiosk.sh --test                 # alle 24 offen, durchklicken
 tools/kiosk.sh --test 2026-12-07      # Stand 7. Dezember
 ```
+
+Der Testmodus nutzt ein eigenes Browser-Profil (`~/.cache/adventkalender/
+chromium-profile-test`), damit er nicht im laufenden Kiosk-Fenster landet.
+Beendet wird er mit `Strg+C` im Terminal; das Fenster schließen reicht nicht,
+weil der Server dann für weitere Tests weiterläuft.
 
 Der Testmodus lässt Bildschirmschoner und Sperre in Ruhe. Fenster schließen
 beendet ihn. Ein zweiter Testmodus-Start während der Kiosk läuft, beendet den

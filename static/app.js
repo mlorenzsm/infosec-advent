@@ -166,7 +166,9 @@ function updateFooter(now) {
   $("bar-fill").style.width = progress + "%";
 
   let hint;
-  if (state.openDay === 0) {
+  if (params.get("alle") && !state.todayDay) {
+    hint = "Testmodus: alle 24 Türchen offen.";
+  } else if (state.openDay === 0) {
     const days = Math.ceil((adventTarget(year) - now) / 86400000);
     hint = days > 0
       ? `Der Kalender öffnet in ${days} ${days === 1 ? "Tag" : "Tagen"} – am 1. Dezember.`
@@ -397,8 +399,9 @@ function tick() {
   updateClock(now);
 
   // Ein Display läuft wochenlang. Nach Mitternacht muss das nächste Türchen
-  // aufgehen, ohne dass jemand die Seite neu lädt.
-  if (!params.get("datum")) {
+  // aufgehen, ohne dass jemand die Seite neu lädt. Nicht im Testmodus: sonst
+  // macht der erste Tick ?alle=1 sofort wieder rückgängig.
+  if (!params.get("datum") && !params.get("alle") && !params.get("liste")) {
     const openDay = computeOpenDay(now, state.data.year);
     if (openDay !== state.openDay) {
       const justOpened = openDay > state.openDay ? openDay : null;
@@ -578,8 +581,10 @@ async function start() {
   const now = nowDate();
   state.todayDay = computeTodayDay(now);
   state.openDay = computeOpenDay(now, state.data.year);
-  // ?liste=1 zeigt alle 24 Türchen zum Korrekturlesen — unabhängig vom Datum.
-  if (params.get("liste")) state.openDay = 24;
+  // Zum Testen unabhängig vom Datum:
+  //   ?alle=1  → alle 24 Türchen offen (durchklicken)
+  //   ?liste=1 → alle 24 Texte untereinander
+  if (params.get("liste") || params.get("alle")) state.openDay = 24;
 
   renderMasthead(state.data);
   renderBoard();

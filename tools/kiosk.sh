@@ -110,8 +110,23 @@ fi
 # --- 2. Flags je Browserfamilie --------------------------------------------
 if [ "$TEST_MODE" = 1 ]; then
   QUERY="?auto=aus"
-  [ -n "$TEST_DATE" ] && QUERY="$QUERY&datum=$TEST_DATE"
+  if [ -n "$TEST_DATE" ]; then
+    QUERY="$QUERY&datum=$TEST_DATE"
+  else
+    # Ohne Datum: alle 24 Türchen offen, unabhängig vom echten Datum.
+    QUERY="$QUERY&alle=1"
+  fi
   URL="$URL$QUERY"
+fi
+
+# Eigene Profile je Modus: Chromium schickt einen Start mit gleichem
+# --user-data-dir in den laufenden Browser („Opening in existing browser
+# session") — der Testmodus würde dann im Kiosk-Fenster landen und nichts
+# öffnen.
+if [ "$TEST_MODE" = 1 ]; then
+  CHROME_PROFILE="$CACHE/chromium-profile-test"
+else
+  CHROME_PROFILE="$CACHE/chromium-profile"
 fi
 
 if [ "$BROWSER_FAMILY" = "firefox" ]; then
@@ -141,12 +156,12 @@ else
   if [ "$TEST_MODE" = 1 ]; then
     # Normales Fenster: Adresszeile sichtbar, damit man Parameter ausprobieren
     # kann. Kiosk-Dialoge bleiben trotzdem abgeschaltet.
-    FLAGS="--user-data-dir=$CACHE/chromium-profile
+    FLAGS="--user-data-dir=$CHROME_PROFILE
 --no-first-run --no-default-browser-check --disable-infobars
 --disable-session-crashed-bubble --disable-features=Translate
 --password-store=basic --check-for-update-interval=31536000"
   else
-    FLAGS="--kiosk --user-data-dir=$CACHE/chromium-profile
+    FLAGS="--kiosk --user-data-dir=$CHROME_PROFILE
 --no-first-run --no-default-browser-check --disable-infobars
 --disable-session-crashed-bubble --disable-features=Translate
 --password-store=basic --check-for-update-interval=31536000"
@@ -201,13 +216,18 @@ if [ "$TEST_MODE" = 0 ]; then
 fi
 
 # --- 5. Browser ------------------------------------------------------------
-# Testmodus: ein Fenster, kein Lock, kein Neustart — schließen beendet alles.
+# Testmodus: ein Fenster, kein Lock, kein Neustart.
 if [ "$TEST_MODE" = 1 ]; then
   echo "Testmodus: $URL"
-  echo "Türchen anklicken; schließen des Fensters beendet den Test."
+  echo "Türchen anklicken. Beenden mit Strg+C in diesem Terminal."
   # shellcheck disable=SC2086
-  "$BROWSER_BIN" $FLAGS "$URL"
-  exit 0
+  "$BROWSER_BIN" $FLAGS "$URL" &
+  BROWSER_PID=$!
+  # Chromium kann sofort zurückkehren, wenn es den Start an eine bereits
+  # laufende Instanz weiterreicht. Der Server läuft weiter, bis Strg+C kommt.
+  wait "$BROWSER_PID" 2>/dev/null
+  echo "Fenster geschlossen. Server läuft noch — Strg+C beendet ihn."
+  while :; do sleep 3600; done
 fi
 
 # Nur ein Kiosk gleichzeitig: Ein zweiter Start würde den Browser nur als
