@@ -246,8 +246,11 @@ Ohne Touch läuft die Automatik allein weiter.
 Same-Origin-Regel fehl — die Seite bliebe leer. Der Server ist ein
 `python3 -m http.server`, also in Mint ohne Zusatzpaket vorhanden.
 
-## Lizenzen
+## Lizenz
 
-Schriften **Geist**, **Geist Mono** (SIL Open Font License 1.1) und
-**Bricolage Grotesque** (SIL Open Font License 1.1), Lizenzen unter
-`static/fonts/`.
+Der Code steht unter der [MIT-Lizenz](LICENSE) — nutzen, verändern,
+weitergeben, auch kommerziell, solange der Copyright-Hinweis erhalten bleibt.
+
+Die Schriften **Geist**, **Geist Mono** und **Bricolage Grotesque** stehen
+unter der SIL Open Font License 1.1, Lizenzen unter `static/fonts/`. Die OFL
+gilt nur für die Schriftdateien, nicht für den restlichen Code.
