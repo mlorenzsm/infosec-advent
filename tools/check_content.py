@@ -30,9 +30,12 @@ def check() -> list[str]:
 
     if not isinstance(data.get("year"), int):
         errors.append("year fehlt oder ist keine Zahl")
-    for key in ("kicker", "title", "subtitle"):
-        if not data.get(key):
-            errors.append(f"{key} fehlt")
+    # Eine Überschrift, keine Kicker/Subline: Auf drei Metern zählt nur sie.
+    if not data.get("title"):
+        errors.append("title fehlt")
+    for stale in ("kicker", "subtitle"):
+        if stale in data:
+            errors.append(f"{stale} wird nicht mehr angezeigt — entfernen")
 
     doors = data.get("doors")
     if not isinstance(doors, list):

@@ -1,4 +1,4 @@
-/* Sicherheitskalender — Ablauf für das Display.
+/* 24 Tage Informationssicherheit — Ablauf für das Display.
  *
  * Drei Zustände pro Türchen, berechnet aus dem Datum:
  *   vergangen  → offen, antippbar, rotiert im Automatik-Modus
@@ -113,10 +113,9 @@ function markSeen(day) {
 }
 
 function renderMasthead(data) {
-  $("kicker").textContent = data.kicker || "";
-  $("title").textContent = data.title || "Sicherheitskalender";
-  $("subtitle").textContent = data.subtitle || "";
-  document.title = data.title || "Sicherheitskalender";
+  const title = data.title || "24 Tage Informationssicherheit";
+  $("title").textContent = title;
+  document.title = title;
 }
 
 function renderBoard() {
@@ -509,8 +508,8 @@ function renderList() {
 
   const head = el("header", "list-head");
   head.append(
-    el("p", "kicker", "Korrekturlesen · alle 24 Türchen"),
-    el("h1", "title", state.data.title || "Sicherheitskalender"),
+    el("p", "list-kicker", "Korrekturlesen · alle 24 Türchen"),
+    el("h1", "title", state.data.title || "24 Tage Informationssicherheit"),
   );
   const back = el("a", "list-back", "← Zurück zum Kalender");
   back.href = location.pathname;
@@ -559,7 +558,7 @@ function renderList() {
   list.append(foot);
 
   stage.replaceChildren(list);
-  document.title = "Korrekturlesen — " + (state.data.title || "Sicherheitskalender");
+  document.title = "Korrekturlesen — " + (state.data.title || "24 Tage Informationssicherheit");
 }
 
 /* --- Start ------------------------------------------------------------- */

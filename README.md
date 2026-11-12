@@ -1,8 +1,11 @@
-# Sicherheitskalender
+# 24 Tage Informationssicherheit
 
 Ein Adventskalender für ein digitales Werbedisplay (Kundenstopper): 24 Türchen
 Informationssicherheit, ein Türchen pro Tag. Reine statische Seite — kein
 Server, keine Datenbank, kein Build-Schritt.
+
+Die Überschrift ist der ganze Kopf — bewusst ohne Kicker und Subline. Auf drei
+Meter zählt nur sie; alles Weitere steht in den Türchen.
 
 ![Raster](docs/board.png)
 ![Quiz](docs/quiz.png)

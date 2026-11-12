@@ -1,4 +1,4 @@
-/* Sicherheitskalender — Display-Fassung für den Kundenstopper.
+/* 24 Tage Informationssicherheit — Display-Fassung für den Kundenstopper.
  *
  * Ein Bildschirm, eine Schriftgröße pro Rolle: alles in rem, skaliert über
  * clamp() mit der kürzeren Bildschirmkante (svmin). So bleibt das Layout auf
@@ -126,29 +126,19 @@
 
 @layer board {
   /* --- Kopf ------------------------------------------------------------- */
+  /* Eine Zeile, eine Aussage: „24 Tage Informationssicherheit". Kicker und
+   * Subline sind bewusst weg — auf drei Meter zählt nur die Überschrift. */
   .masthead { display: grid; gap: var(--s-2); }
-  .kicker {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-  .mast-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--s-5);
-    flex-wrap: wrap;
-  }
   .title {
     font-family: var(--font-display);
     font-size: var(--text-2xl);
     font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
+    letter-spacing: -0.025em;
+    line-height: 1.02;
+    /* Kein max-width: Der Titel bricht an der Wortgrenze um
+     * („24 Tage" / „Informationssicherheit") statt mitten im Wort. */
+    text-wrap: balance;
   }
-  .subtitle { color: var(--muted); font-size: var(--text-md); max-width: 42ch; }
 
   /* --- Raster ----------------------------------------------------------- */
   /* 8 × 3 auf dem Display: 43" im Hochformat, aus 3 m lesbar. */
@@ -518,7 +508,6 @@
     }
     .detail { padding: var(--s-3); }
     .detail-card { gap: var(--s-4); padding: var(--s-4); }
-    .mast-row { flex-direction: column; gap: var(--s-1); }
     .foot { grid-template-columns: minmax(0, auto) minmax(0, 1fr); }
     .foot-clock { display: none; }
     .board {
@@ -528,6 +517,13 @@
     }
     .board > li { aspect-ratio: 1 / 0.8; }
     .door-day { font-size: var(--text-lg); }
+    .title {
+      font-size: var(--text-xl);
+      /* „Informationssicherheit" hat keine Trennstelle und passt hier nicht
+       * in eine Zeile — umbrechen im Wort ist besser als abschneiden. */
+      overflow-wrap: anywhere;
+      text-wrap: wrap;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -546,6 +542,14 @@
     user-select: text;
   }
   .list-head { display: grid; gap: var(--s-2); }
+  .list-kicker {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .list .title { max-width: none; }
   .list-back {
     justify-self: start;
     color: var(--accent);

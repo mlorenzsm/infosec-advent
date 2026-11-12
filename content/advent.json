@@ -1,8 +1,6 @@
 {
   "year": 2026,
-  "kicker": "24 Tage Informationssicherheit",
-  "title": "Sicherheitskalender",
-  "subtitle": "Ein Türchen pro Tag. Kein Fachchinesisch, nur Dinge, die wirklich helfen.",
+  "title": "24 Tage Informationssicherheit",
   "doors": [
     {
       "day": 1,
