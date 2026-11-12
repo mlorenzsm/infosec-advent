@@ -28,6 +28,10 @@ es dafür `tools/kiosk.sh` — siehe [Kiosk](#kiosk-linux-mint).
 - Jedes Türchen ist eine kleine Hütte: Satteldach mit Schnee, Holzwand, ein
   Fenster mit der Tageszahl. Geschlossen ist das Fenster dunkel, geöffnet
   leuchtet es warm — heute am hellsten.
+- Die Hütten stehen **verstreut** im Raster, wie bei einem echten
+  Wandkalender. Der Inhalt bleibt bei seiner Zahl (Tür 2 ist das Quiz, Tür 24
+  das Finale), nur der Platz wechselt. Die Mischung ist deterministisch:
+  gleicher Seed, gleiche Anordnung — bei jedem Neuladen und auf jedem Gerät.
 - Über dem Dorf hängen zwei Lichterketten mit blinkenden Birnen; die Dächer
   haben drei Höhen im Wechsel, und über Tür 24 hängt ein Sternenschild.
 - **Heute** ist gold hinterlegt und wird zuerst gezeigt.
@@ -53,6 +57,8 @@ Türen zu. Zum Durchklicken gibt es drei Wege.
 | `?auto=aus` | Automatik aus, nur Klick öffnet |
 | `?alle=1` | Alle 24 Türchen offen, unabhängig vom Datum — zum Durchklicken |
 | `?liste=1` | Alle 24 Texte untereinander zum Korrekturlesen |
+| `?geordnet=1` | Hütten in 1–24-Reihenfolge statt verstreut |
+| `?seed=7` | Andere Mischung erzwingen (Zahl frei wählbar) |
 
 Beispiele: <http://localhost:8099/?datum=2026-12-07&auto=aus> ·
 <http://localhost:8099/?tur=2> · <http://localhost:8099/?alle=1> ·
@@ -107,6 +113,10 @@ gültigen Index und zu langen Texten — eine Tür muss aus drei Metern in rund
 
 `year` in `advent.json` setzt das Kalenderjahr. Für ein anderes Jahr nur diese
 Zahl ändern; die Türchen selbst sind jahresunabhängig formuliert.
+
+Das Jahr ist gleichzeitig der Seed der Mischung: Jedes Jahr ergibt eine neue
+Anordnung der Hütten, ohne dass etwas eingestellt werden muss. Wer die
+Reihenfolge behalten will, hängt `?geordnet=1` an die URL.
 
 ## Aufbau
 

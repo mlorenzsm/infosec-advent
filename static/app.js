@@ -118,11 +118,44 @@ function renderMasthead(data) {
   document.title = title;
 }
 
+/* Positionen der Hütten im Raster.
+ *
+ * Wie ein echter Wandkalender: Die Türchen stehen verstreut, nicht in
+ * 1–24-Reihenfolge. Der Inhalt bleibt bei seiner Zahl (Tür 2 bleibt das
+ * Quiz, Tür 24 das Finale) — nur der Platz im Raster wechselt.
+ *
+ * Die Mischung ist deterministisch: gleicher Seed → gleiche Anordnung, also
+ * bei jedem Neuladen und auf jedem Gerät identisch. Der Seed enthält das
+ * Jahr, damit es nächstes Jahr ein neues Dorf gibt. ?geordnet=1 schaltet
+ * die Reihenfolge ab, ?seed=… erzwingt eine andere Anordnung. */
+
+function shuffledPositions() {
+  const days = Array.from({ length: 24 }, (_, i) => i + 1);
+  if (params.get("geordnet")) return days;
+
+  let seed = Number(params.get("seed")) || state.data.year || 2026;
+  // mulberry32: klein, schnell, für 24 Elemente mehr als genug.
+  const rand = () => {
+    seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  // Fisher-Yates
+  for (let i = days.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [days[i], days[j]] = [days[j], days[i]];
+  }
+  return days;
+}
+
 function renderBoard() {
   board.innerHTML = "";
   const byDay = new Map(state.data.doors.map((d) => [d.day, d]));
 
-  for (let day = 1; day <= 24; day++) {
+  // Reihenfolge der Rasterzellen; die Zelle trägt die Tageszahl.
+  for (const day of shuffledPositions()) {
     const item = byDay.get(day);
     const li = document.createElement("li");
     const btn = document.createElement("button");

@@ -48,11 +48,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   d = f.contentDocument;
   const doors = d.querySelectorAll(".door");
   ok("24 Türen", doors.length === 24);
-  ok("Tag 3 offen", doors[2].getAttribute("aria-disabled") !== "true");
-  ok("Tag 4 zu", doors[3].getAttribute("aria-disabled") === "true");
-  ok("Tag 3 als heute markiert", doors[2].classList.contains("is-today"));
+  // Nach Position zu greifen wäre falsch: Das Raster ist gemischt.
+  const door = (n) => d.querySelector(`.door[data-day="${n}"]`);
+  ok("Tag 3 offen", door(3).getAttribute("aria-disabled") !== "true");
+  ok("Tag 4 zu", door(4).getAttribute("aria-disabled") === "true");
+  ok("Tag 3 als heute markiert", door(3).classList.contains("is-today"));
   ok("Fortschritt 3/24", d.getElementById("bar").getAttribute("aria-valuenow") === "3");
-  doors[5].click();
+  door(6).click();
   ok("geschlossene Tür zeigt Hinweis", !d.getElementById("toast").hidden);
   f.remove();
 
@@ -88,7 +90,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok("?alle=1: alle 24 offen", alleDoors.every((x) => x.getAttribute("aria-disabled") !== "true"),
      String(alleDoors.filter((x) => x.getAttribute("aria-disabled") !== "true").length));
   ok("?alle=1 bleibt nach Ticks offen", alleDoors.every((x) => !x.classList.contains("is-future")));
-  alleDoors[4].click();
+  d.querySelector('.door[data-day="5"]').click();
   ok("?alle=1: Türchen öffnet sich", !d.getElementById("detail").hidden);
   ok("?alle=1: richtiges Türchen (5)", /Passwortschule|Länge schlägt/.test(
      d.querySelector(".detail-card")?.textContent || ""));
@@ -104,6 +106,37 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
      !!d.querySelector('.door[data-day="24"] .hut-sign'));
   ok("Lichterkette mit Birnen", d.querySelectorAll(".bulb").length > 8,
      String(d.querySelectorAll(".bulb").length));
+  f.remove();
+
+  // 9) Verstreute Hütten: alle 24 genau einmal, stabil, abschaltbar
+  f = await load("?datum=2026-12-09&auto=aus");
+  d = f.contentDocument;
+  const orderA = [...d.querySelectorAll(".door")].map((x) => x.dataset.day);
+  ok("Mischung: 24 Hütten", orderA.length === 24);
+  ok("Mischung: jede Zahl genau einmal",
+     new Set(orderA).size === 24 && orderA.every((v) => Number(v) >= 1 && Number(v) <= 24));
+  ok("Mischung: nicht in Reihenfolge",
+     orderA.join(",") !== Array.from({length:24},(_,i)=>String(i+1)).join(","));
+  f.remove();
+
+  f = await load("?datum=2026-12-09&auto=aus");
+  d = f.contentDocument;
+  const orderB = [...d.querySelectorAll(".door")].map((x) => x.dataset.day);
+  ok("Mischung: stabil über Neuladen", orderA.join(",") === orderB.join(","));
+  f.remove();
+
+  f = await load("?datum=2026-12-09&auto=aus&geordnet=1");
+  d = f.contentDocument;
+  const ordered = [...d.querySelectorAll(".door")].map((x) => x.dataset.day);
+  ok("?geordnet=1 stellt 1–24 wieder her",
+     ordered.join(",") === Array.from({length:24},(_,i)=>String(i+1)).join(","));
+  f.remove();
+
+  f = await load("?datum=2026-12-09&auto=aus&seed=7");
+  d = f.contentDocument;
+  const seeded = [...d.querySelectorAll(".door")].map((x) => x.dataset.day);
+  ok("?seed=7 ergibt andere Anordnung", seeded.join(",") !== orderA.join(","));
+  ok("?seed=7 ist vollständig", new Set(seeded).size === 24);
   f.remove();
 
   document.getElementById("out").textContent = results.join("\n");
