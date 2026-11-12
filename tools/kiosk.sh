@@ -10,14 +10,14 @@
 # Testen:      tools/kiosk.sh --test [YYYY-MM-DD]
 #              (normales Fenster mit Adresszeile, Automatik aus, optional mit
 #               einem Datum — zum Durchklicken aller Türchen auf dem Gerät)
-# Automatisch: siehe deploy/adventkalender.desktop und README, Abschnitt Kiosk.
+# Automatisch: siehe deploy/infosec-advent.desktop und README, Abschnitt Kiosk.
 
 set -u
 
 DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 PORT=${PORT:-8099}
 URL="http://127.0.0.1:$PORT/"
-CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/adventkalender"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/infosec-advent"
 SERVER_PID=""
 DRY_RUN=0
 TEST_DATE=""
@@ -232,7 +232,7 @@ fi
 
 # Nur ein Kiosk gleichzeitig: Ein zweiter Start würde den Browser nur als
 # weiteren Tab in den laufenden schicken und hier in einer Startschleife enden.
-LOCKDIR="${XDG_RUNTIME_DIR:-/tmp}/adventkalender-kiosk-$(id -u)"
+LOCKDIR="${XDG_RUNTIME_DIR:-/tmp}/infosec-advent-kiosk-$(id -u)"
 LOCK_OWNED=0
 if ! mkdir "$LOCKDIR" 2>/dev/null; then
   OTHER=$(cat "$LOCKDIR/pid" 2>/dev/null || echo "")

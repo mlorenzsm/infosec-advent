@@ -1,8 +1,13 @@
-# 24 Tage Informationssicherheit
+# infosec-advent — 24 Tage Informationssicherheit
 
 Ein Adventskalender für ein digitales Werbedisplay (Kundenstopper): 24 Türchen
 Informationssicherheit, ein Türchen pro Tag. Reine statische Seite — kein
 Server, keine Datenbank, kein Build-Schritt.
+
+> A 24-door advent calendar for infosec awareness, built for a touchscreen
+> kiosk. Each door is a little Christmas hut that lights up on its day. Pure
+> HTML/CSS/JS, no build step, German content, ships with a Linux kiosk
+> launcher.
 
 Die Überschrift ist der ganze Kopf — bewusst ohne Kicker und Subline. Auf drei
 Meter zählt nur sie; alles Weitere steht in den Türchen.
@@ -62,7 +67,7 @@ tools/kiosk.sh --test                 # alle 24 offen, durchklicken
 tools/kiosk.sh --test 2026-12-07      # Stand 7. Dezember
 ```
 
-Der Testmodus nutzt ein eigenes Browser-Profil (`~/.cache/adventkalender/
+Der Testmodus nutzt ein eigenes Browser-Profil (`~/.cache/infosec-advent/
 chromium-profile-test`), damit er nicht im laufenden Kiosk-Fenster landet.
 Beendet wird er mit `Strg+C` im Terminal; das Fenster schließen reicht nicht,
 weil der Server dann für weitere Tests weiterläuft.
@@ -167,7 +172,7 @@ tools/kiosk.sh --dry-run
 Kommt „Kein Browser gefunden“, fehlt Chromium — `install-kiosk.sh` bricht dann
 ab, statt einen Autostart einzurichten, der am 1. Dezember nichts zeigt.
 
-`install-kiosk.sh` legt `~/.config/autostart/adventkalender.desktop` an und
+`install-kiosk.sh` legt `~/.config/autostart/infosec-advent.desktop` an und
 schaltet in Cinnamon Bildschirmschoner, Standby und automatische Sperre ab.
 Nach dem nächsten Login startet der Kalender im Vollbild; stürzt Chromium ab,
 startet `tools/kiosk.sh` es nach zwei Sekunden neu.
@@ -189,13 +194,13 @@ Das Skript startet den lokalen Server auf Port 8099 (nur auf 127.0.0.1
 gebunden), öffnet den gefundenen Browser im Kiosk-Modus und lässt ihn in einer
 Schleife laufen. Ein zweiter Start bricht ab, solange der erste läuft
 („Der Kiosk läuft bereits“) — beenden mit `kill <PID>`, die PID steht auch in
-`/tmp/adventkalender-kiosk-<uid>/pid`.
+`/tmp/infosec-advent-kiosk-<uid>/pid`.
 
 Anderer Port: `PORT=8123 tools/kiosk.sh`. Anderer Browser:
 `BROWSER=firefox tools/kiosk.sh`.
 
 Browser-Profil und Firefox-Einstellungen liegen unter
-`~/.cache/adventkalender/` — löschen ist jederzeit gefahrlos.
+`~/.cache/infosec-advent/` — löschen ist jederzeit gefahrlos.
 
 ### Alternative: nur ein Tab im normalen Browser
 

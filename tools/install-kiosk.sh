@@ -4,13 +4,13 @@
 #   tools/install-kiosk.sh            # installieren
 #   tools/install-kiosk.sh --remove   # wieder entfernen
 #
-# Legt ~/.config/autostart/adventkalender.desktop an und schaltet in Cinnamon
+# Legt ~/.config/autostart/infosec-advent.desktop an und schaltet in Cinnamon
 # Bildschirmschoner und Ruhezustand ab, damit das Display dauerhaft anbleibt.
 
 set -eu
 
 DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-TARGET="${XDG_CONFIG_HOME:-$HOME/.config}/autostart/adventkalender.desktop"
+TARGET="${XDG_CONFIG_HOME:-$HOME/.config}/autostart/infosec-advent.desktop"
 
 if [ "${1:-}" = "--remove" ]; then
   rm -f "$TARGET"
@@ -29,7 +29,7 @@ if ! "$DIR/tools/kiosk.sh" --dry-run >/dev/null 2>&1; then
   exit 1
 fi
 "$DIR/tools/kiosk.sh" --dry-run | sed -n '1,2p'
-sed "s|__REPO__|$DIR|g" "$DIR/deploy/adventkalender.desktop" > "$TARGET"
+sed "s|__REPO__|$DIR|g" "$DIR/deploy/infosec-advent.desktop" > "$TARGET"
 echo "Autostart eingerichtet: $TARGET"
 echo "Nächster Login startet den Kalender im Vollbild."
 

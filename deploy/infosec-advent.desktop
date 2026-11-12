@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=Sicherheitskalender
-Comment=Adventskalender im Vollbild auf dem Kundenstopper
+Name=infosec-advent
+Comment=24 days of infosec in fullscreen on the kiosk display
 # Exec-Pfad wird beim Installieren ersetzt (tools/install-kiosk.sh)
 Exec=__REPO__/tools/kiosk.sh
 Path=__REPO__
